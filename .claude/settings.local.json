@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet new:*)",
+      "Bash(bash generate-structure.sh)",
+      "Bash(ls /c/Python*)",
+      "Read(//c/Users/About/AppData/Local/Programs/**)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" --version)",
+      "Bash(py --version)"
+    ]
+  }
+}

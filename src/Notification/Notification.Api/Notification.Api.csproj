@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
+    <PackageReference Include="DigiTFactory.Libraries.EventBus.InMemory" Version="0.1.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..$CTX.Application$CTX.Application.csproj" />
+    <ProjectReference Include="..$CTX.Domain$CTX.Domain.csproj" />
+    <ProjectReference Include="..$CTX.DomainServices$CTX.DomainServices.csproj" />
+    <ProjectReference Include="..$CTX.InternalContracts$CTX.InternalContracts.csproj" />
+    <ProjectReference Include="..$CTX.Storage$CTX.Storage.csproj" />
+  </ItemGroup>
+</Project>

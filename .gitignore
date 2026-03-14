@@ -1,0 +1,25 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.vs/
+
+## IDE
+.idea/
+.vscode/
+*.swp
+
+## Build
+[Dd]ebug/
+[Rr]elease/
+publish/
+
+## NuGet
+*.nupkg
+packages/
+
+## Misc
+*.sh
