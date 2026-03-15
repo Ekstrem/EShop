@@ -1,15 +1,33 @@
 namespace Payment.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Payment.Domain.Abstraction;
 using Payment.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(IPaymentAnemicModel model) : base(model) { }
+    public IPaymentAnemicModel Model { get; }
+
+    private Aggregate(IPaymentAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(IPaymentAnemicModel model) => new(model);
+
+    private AggregateResult<IPayment, IPaymentAnemicModel> Success(IPaymentAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IPayment, IPaymentAnemicModel>
+            .Commit<IPayment, IPaymentAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IPayment, IPaymentAnemicModel>(data);
+    }
+
+    private AggregateResult<IPayment, IPaymentAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IPayment, IPaymentAnemicModel>
+            .Commit<IPayment, IPaymentAnemicModel>(Model, Model);
+        return new AggregateResultException<IPayment, IPaymentAnemicModel>(
+            data, new FailedSpecification<IPayment, IPaymentAnemicModel>(error));
+    }
 
     public AggregateResult<IPayment, IPaymentAnemicModel> InitiatePayment(
         Guid orderId,
@@ -19,8 +37,7 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
     {
         var validator = new IdempotencyValidator();
         if (!validator.IsSatisfiedBy(Model, orderId))
-            return AggregateResult<IPayment, IPaymentAnemicModel>.Fail(
-                "A payment for this order already exists.");
+            return Fail("A payment for this order already exists.");
 
         var root = PaymentRoot.CreateInstance(orderId, amount, currency, paymentMethod);
         var anemic = new AnemicModel
@@ -29,7 +46,7 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
             Transactions = new List<ITransaction>()
         };
 
-        return AggregateResult<IPayment, IPaymentAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPayment, IPaymentAnemicModel> HandleProviderWebhook(
@@ -40,8 +57,7 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
     {
         var dedupValidator = new TransactionDeduplicationValidator();
         if (!dedupValidator.IsSatisfiedBy(Model, providerTransactionId))
-            return AggregateResult<IPayment, IPaymentAnemicModel>.Fail(
-                "Transaction with this provider ID has already been processed.");
+            return Fail("Transaction with this provider ID has already been processed.");
 
         var transaction = Transaction.CreateInstance(
             providerTransactionId,
@@ -68,15 +84,14 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
             Transactions = transactions
         };
 
-        return AggregateResult<IPayment, IPaymentAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPayment, IPaymentAnemicModel> VoidPayment()
     {
         var validator = new CanVoidValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IPayment, IPaymentAnemicModel>.Fail(
-                "Only payments in Initiated status can be voided.");
+            return Fail("Only payments in Initiated status can be voided.");
 
         var root = PaymentRoot.CreateInstance(
             Model.Root.OrderId,
@@ -91,20 +106,18 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
             Transactions = Model.Transactions.ToList()
         };
 
-        return AggregateResult<IPayment, IPaymentAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPayment, IPaymentAnemicModel> RequestRefund(decimal refundAmount)
     {
         var statusValidator = new IsCompletedOrPartiallyRefundedValidator();
         if (!statusValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IPayment, IPaymentAnemicModel>.Fail(
-                "Refunds can only be requested for completed or partially refunded payments.");
+            return Fail("Refunds can only be requested for completed or partially refunded payments.");
 
         var amountValidator = new RefundAmountValidator();
         if (!amountValidator.IsSatisfiedBy(Model, refundAmount))
-            return AggregateResult<IPayment, IPaymentAnemicModel>.Fail(
-                "Refund amount exceeds the remaining refundable amount.");
+            return Fail("Refund amount exceeds the remaining refundable amount.");
 
         var transaction = Transaction.CreateInstance(
             Guid.NewGuid().ToString(),
@@ -137,7 +150,7 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
             Transactions = transactions
         };
 
-        return AggregateResult<IPayment, IPaymentAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPayment, IPaymentAnemicModel> CapturePayment(
@@ -145,8 +158,7 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
     {
         var validator = new IsInitiatedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IPayment, IPaymentAnemicModel>.Fail(
-                "Only payments in Initiated status can be captured.");
+            return Fail("Only payments in Initiated status can be captured.");
 
         var transaction = Transaction.CreateInstance(
             providerTransactionId,
@@ -171,7 +183,7 @@ internal sealed class Aggregate : Aggregate<IPayment, IPaymentAnemicModel>
             Transactions = transactions
         };
 
-        return AggregateResult<IPayment, IPaymentAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     private static string DetermineStatusAfterWebhook(

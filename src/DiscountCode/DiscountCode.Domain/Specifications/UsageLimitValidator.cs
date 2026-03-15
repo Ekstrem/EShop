@@ -1,12 +1,11 @@
 namespace DiscountCode.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using DiscountCode.Domain.Abstraction;
 
-internal sealed class UsageLimitValidator : IBusinessOperationValidator<IDiscountCodeAnemicModel>
+internal sealed class UsageLimitValidator
 {
     public bool IsSatisfiedBy(IDiscountCodeAnemicModel model)
         => model.Root.UsageCount < model.Root.MaxUsage;
 
-    public string ErrorMessage => "Discount code usage limit has been reached.";
+    public string Reason => "Discount code usage limit has been reached.";
 }

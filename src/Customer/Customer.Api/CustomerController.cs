@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using Customer.Application.Commands;
 using Customer.Application.Queries;
 using Customer.InternalContracts;
@@ -28,8 +29,8 @@ public sealed class CustomerController : ControllerBase
         var result = await _mediator.Send(command, ct);
         return CreatedAtAction(
             nameof(GetProfile),
-            new { id = result.AnemicModel.Id },
-            new { Id = result.AnemicModel.Id });
+            new { id = result.Model().Id },
+            new { Id = result.Model().Id });
     }
 
     /// <summary>

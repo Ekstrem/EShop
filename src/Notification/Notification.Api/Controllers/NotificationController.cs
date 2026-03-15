@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Notification.Api.Controllers;
 
 using MediatR;
@@ -22,7 +23,7 @@ public sealed class NotificationController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/render")]
@@ -33,7 +34,7 @@ public sealed class NotificationController : ControllerBase
     {
         var command = new RenderNotificationCommand(id, request.RenderedContent, request.Subject);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/send")]
@@ -44,7 +45,7 @@ public sealed class NotificationController : ControllerBase
     {
         var command = new SendNotificationCommand(id, request.HasConsent);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/retry")]
@@ -52,7 +53,7 @@ public sealed class NotificationController : ControllerBase
     {
         var command = new RetryNotificationCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("{id:guid}")]

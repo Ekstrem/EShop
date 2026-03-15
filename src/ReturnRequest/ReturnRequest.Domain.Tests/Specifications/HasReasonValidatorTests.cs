@@ -11,7 +11,7 @@ public sealed class HasReasonValidatorTests
     public void IsValid_WhenReasonProvided_ReturnsTrue()
     {
         var model = TestAnemicModelBuilder.Build(reason: "Product is defective");
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Theory]
@@ -20,6 +20,6 @@ public sealed class HasReasonValidatorTests
     public void IsValid_WhenReasonMissing_ReturnsFalse(string reason)
     {
         var model = TestAnemicModelBuilder.Build(reason: reason);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

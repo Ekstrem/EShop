@@ -1,6 +1,6 @@
 namespace StockItem.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 public interface IReservation : IValueObject
 {

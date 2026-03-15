@@ -1,4 +1,8 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Session.Domain;
 using Session.Domain.Abstraction;
@@ -32,8 +36,9 @@ public sealed class SessionRepository : IRepository<ISession, ISessionAnemicMode
         return SessionAnemicModel.CreateInstance(entity.Id, root);
     }
 
-    public async Task SaveAsync(ISessionAnemicModel model, CancellationToken ct = default)
+    public async Task SaveAsync(AggregateResult<ISession, ISessionAnemicModel> result, CancellationToken ct = default)
     {
+        var model = result.Model()!;
         var existing = await _dbContext.Sessions
             .FirstOrDefaultAsync(s => s.Id == model.Id, ct);
 

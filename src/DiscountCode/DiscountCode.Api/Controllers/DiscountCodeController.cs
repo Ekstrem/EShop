@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace DiscountCode.Api.Controllers;
 
 using MediatR;
@@ -22,7 +23,7 @@ public sealed class DiscountCodeController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("{id:guid}/validate")]
@@ -30,7 +31,7 @@ public sealed class DiscountCodeController : ControllerBase
     {
         var command = new ValidateDiscountCodeCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("{id:guid}/redeem")]
@@ -41,7 +42,7 @@ public sealed class DiscountCodeController : ControllerBase
     {
         var command = new RedeemDiscountCodeCommand(id, request.OrderId);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("{id:guid}/compensate")]
@@ -52,7 +53,7 @@ public sealed class DiscountCodeController : ControllerBase
     {
         var command = new CompensateRedemptionCommand(id, request.OrderId);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/deactivate")]
@@ -60,7 +61,7 @@ public sealed class DiscountCodeController : ControllerBase
     {
         var command = new DeactivateCodeCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("{id:guid}")]

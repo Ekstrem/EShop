@@ -1,7 +1,8 @@
 namespace Promotion.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using Promotion.Domain;
 using Promotion.Domain.Abstraction;
 using Promotion.Domain.Implementation;

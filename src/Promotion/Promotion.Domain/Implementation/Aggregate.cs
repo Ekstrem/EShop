@@ -1,15 +1,33 @@
 namespace Promotion.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Promotion.Domain.Abstraction;
 using Promotion.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<IPromotion, IPromotionAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(IPromotionAnemicModel model) : base(model) { }
+    public IPromotionAnemicModel Model { get; }
+
+    private Aggregate(IPromotionAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(IPromotionAnemicModel model) => new(model);
+
+    private AggregateResult<IPromotion, IPromotionAnemicModel> Success(IPromotionAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IPromotion, IPromotionAnemicModel>
+            .Commit<IPromotion, IPromotionAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IPromotion, IPromotionAnemicModel>(data);
+    }
+
+    private AggregateResult<IPromotion, IPromotionAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IPromotion, IPromotionAnemicModel>
+            .Commit<IPromotion, IPromotionAnemicModel>(Model, Model);
+        return new AggregateResultException<IPromotion, IPromotionAnemicModel>(
+            data, new FailedSpecification<IPromotion, IPromotionAnemicModel>(error));
+    }
 
     public AggregateResult<IPromotion, IPromotionAnemicModel> CreatePromotion(
         string name,
@@ -32,15 +50,13 @@ internal sealed class Aggregate : Aggregate<IPromotion, IPromotionAnemicModel>
 
         var dateValidator = new DateRangeValidator();
         if (!dateValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Start date must be before end date.");
+            return Fail("Start date must be before end date.");
 
         var discountValidator = new DiscountValueValidator();
         if (!discountValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Discount value must be greater than 0 and percentage must not exceed 100.");
+            return Fail("Discount value must be greater than 0 and percentage must not exceed 100.");
 
-        return AggregateResult<IPromotion, IPromotionAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPromotion, IPromotionAnemicModel> UpdatePromotion(
@@ -56,8 +72,7 @@ internal sealed class Aggregate : Aggregate<IPromotion, IPromotionAnemicModel>
         var draftValidator = new IsDraftValidator();
         var activeValidator = new IsActiveValidator();
         if (!draftValidator.IsSatisfiedBy(Model) && !activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Only Draft or Active promotions can be updated.");
+            return Fail("Only Draft or Active promotions can be updated.");
 
         var root = PromotionRoot.CreateInstance(
             name, description, discountType, discountValue, startDate, endDate,
@@ -71,28 +86,24 @@ internal sealed class Aggregate : Aggregate<IPromotion, IPromotionAnemicModel>
 
         var dateValidator = new DateRangeValidator();
         if (!dateValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Start date must be before end date.");
+            return Fail("Start date must be before end date.");
 
         var discValidator = new DiscountValueValidator();
         if (!discValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Discount value must be greater than 0 and percentage must not exceed 100.");
+            return Fail("Discount value must be greater than 0 and percentage must not exceed 100.");
 
-        return AggregateResult<IPromotion, IPromotionAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPromotion, IPromotionAnemicModel> ActivatePromotion()
     {
         var draftValidator = new IsDraftValidator();
         if (!draftValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Only draft promotions can be activated.");
+            return Fail("Only draft promotions can be activated.");
 
         var expiredValidator = new IsNotExpiredValidator();
         if (!expiredValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Cannot activate an expired promotion.");
+            return Fail("Cannot activate an expired promotion.");
 
         var root = PromotionRoot.CreateInstance(
             Model.Root.Name, Model.Root.Description, Model.Root.DiscountType,
@@ -105,15 +116,14 @@ internal sealed class Aggregate : Aggregate<IPromotion, IPromotionAnemicModel>
             AllowStacking = Model.AllowStacking
         };
 
-        return AggregateResult<IPromotion, IPromotionAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IPromotion, IPromotionAnemicModel> DeactivatePromotion()
     {
         var activeValidator = new IsActiveValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IPromotion, IPromotionAnemicModel>.Fail(
-                "Only active promotions can be deactivated.");
+            return Fail("Only active promotions can be deactivated.");
 
         var root = PromotionRoot.CreateInstance(
             Model.Root.Name, Model.Root.Description, Model.Root.DiscountType,
@@ -126,6 +136,6 @@ internal sealed class Aggregate : Aggregate<IPromotion, IPromotionAnemicModel>
             AllowStacking = Model.AllowStacking
         };
 
-        return AggregateResult<IPromotion, IPromotionAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

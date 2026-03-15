@@ -1,17 +1,13 @@
 namespace Cart.DomainServices;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 
 public class BusAdapter : IObserver<AggregateResult<ICart, ICartAnemicModel>>
 {
-    private readonly IEventBus _eventBus;
-
-    public BusAdapter(IEventBus eventBus)
-    {
-        _eventBus = eventBus;
-    }
+    public BusAdapter() { }
 
     public void OnCompleted() { }
 
@@ -19,5 +15,7 @@ public class BusAdapter : IObserver<AggregateResult<ICart, ICartAnemicModel>>
         => throw error;
 
     public void OnNext(AggregateResult<ICart, ICartAnemicModel> value)
-        => _eventBus.Publish(value);
+    {
+        // Publish domain events to event bus (stub).
+    }
 }

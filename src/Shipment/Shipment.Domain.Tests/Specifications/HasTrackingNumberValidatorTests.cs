@@ -11,7 +11,7 @@ public sealed class HasTrackingNumberValidatorTests
     public void IsValid_WhenTrackingNumberExists_ReturnsTrue()
     {
         var model = TestAnemicModelBuilder.Build(trackingNumber: "TRK-12345");
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Theory]
@@ -21,6 +21,6 @@ public sealed class HasTrackingNumberValidatorTests
     public void IsValid_WhenTrackingNumberMissing_ReturnsFalse(string? trackingNumber)
     {
         var model = TestAnemicModelBuilder.Build(trackingNumber: trackingNumber ?? string.Empty);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

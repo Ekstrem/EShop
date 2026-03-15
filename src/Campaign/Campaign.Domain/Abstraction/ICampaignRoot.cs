@@ -1,8 +1,8 @@
 namespace Campaign.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface ICampaignRoot : IAggregateRoot<ICampaign>
+public interface ICampaignRoot : IValueObject
 {
     string Name { get; }
     string Subject { get; }

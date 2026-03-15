@@ -1,13 +1,18 @@
 namespace Category.DomainServices;
 
-using Hive.SeedWorks.Events;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Category.Domain;
 
 public sealed class Notifier : INotifier<ICategory>
 {
-    public Task Notify<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-        where TEvent : IDomainEvent<ICategory>
+    public void Notify<TModel>(AggregateResult<ICategory, TModel> result)
+        where TModel : IAnemicModel<ICategory>
     {
-        return Task.CompletedTask;
     }
 }

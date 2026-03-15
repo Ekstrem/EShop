@@ -1,6 +1,8 @@
 namespace Review.Storage;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Review.Domain;
 using Review.Domain.Abstraction;
 
@@ -9,7 +11,7 @@ using Review.Domain.Abstraction;
 /// </summary>
 public sealed class CommandDbContext : ICommandDbContext<IReview>
 {
-    public Task SaveAsync(IReviewAnemicModel model, CancellationToken cancellationToken = default)
+    public Task SaveAsync(IAnemicModel<IReview> model, CancellationToken cancellationToken = default)
     {
         // Persist aggregate state to command store (PostgreSQL, etc.)
         return Task.CompletedTask;

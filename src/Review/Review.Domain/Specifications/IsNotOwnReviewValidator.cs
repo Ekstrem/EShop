@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Review.Domain.Abstraction;
 
 namespace Review.Domain.Specifications;
@@ -6,7 +5,7 @@ namespace Review.Domain.Specifications;
 /// <summary>
 /// Validates that the user is not the author of the review (for voting/flagging).
 /// </summary>
-internal sealed class IsNotOwnReviewValidator : IBusinessOperationValidator<IReviewAnemicModel>
+internal sealed class IsNotOwnReviewValidator
 {
     private readonly Guid _userId;
 
@@ -23,5 +22,5 @@ internal sealed class IsNotOwnReviewValidator : IBusinessOperationValidator<IRev
     public bool IsSatisfiedBy(IReviewAnemicModel model)
         => model.Root.CustomerId != _userId;
 
-    public string ErrorMessage => "Cannot perform this operation on your own review.";
+    public string Reason => "Cannot perform this operation on your own review.";
 }

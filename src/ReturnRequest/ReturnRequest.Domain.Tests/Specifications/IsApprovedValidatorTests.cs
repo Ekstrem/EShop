@@ -11,7 +11,7 @@ public sealed class IsApprovedValidatorTests
     public void IsValid_WhenStatusIsApproved_ReturnsTrue()
     {
         var model = TestAnemicModelBuilder.Build(status: "Approved");
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Theory]
@@ -23,6 +23,6 @@ public sealed class IsApprovedValidatorTests
     public void IsValid_WhenStatusIsNotApproved_ReturnsFalse(string status)
     {
         var model = TestAnemicModelBuilder.Build(status: status);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

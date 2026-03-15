@@ -1,8 +1,8 @@
 namespace Notification.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface INotificationRoot : IAggregateRoot<INotification>
+public interface INotificationRoot : IValueObject
 {
     Guid CustomerId { get; }
     Guid EventId { get; }

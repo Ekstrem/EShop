@@ -1,7 +1,11 @@
 using Customer.Domain;
 using Customer.Domain.Abstraction;
 using Customer.Domain.Implementation;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 
 namespace Customer.DomainServices;
 
@@ -26,6 +30,6 @@ public sealed class AggregateProvider
         AggregateResult<ICustomer, ICustomerAnemicModel> result,
         CancellationToken ct = default)
     {
-        await _repository.SaveAsync(result.AnemicModel, ct);
+        await _repository.SaveAsync(result, ct);
     }
 }

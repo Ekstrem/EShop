@@ -1,18 +1,15 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Specifications;
+
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the address book does not exceed the maximum of 10 addresses.
 /// </summary>
-public sealed class AddressBookLimitValidator : IBusinessOperationValidator<ICustomer, ICustomerAnemicModel>
+public sealed class AddressBookLimitValidator
 {
     private const int MaxAddresses = 10;
 
-    private AddressBookLimitValidator()
-    {
-    }
+    private AddressBookLimitValidator() { }
 
     public static AddressBookLimitValidator CreateInstance()
     {
@@ -24,5 +21,5 @@ public sealed class AddressBookLimitValidator : IBusinessOperationValidator<ICus
         return model.AddressBook.Addresses.Count <= MaxAddresses;
     }
 
-    public string ErrorMessage => $"Address book cannot contain more than {MaxAddresses} addresses.";
+    public string Reason => $"Address book cannot contain more than {MaxAddresses} addresses.";
 }

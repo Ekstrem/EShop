@@ -1,8 +1,8 @@
 namespace DiscountCode.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IDiscountCodeRoot : IAggregateRoot<IDiscountCode>
+public interface IDiscountCodeRoot : IValueObject
 {
     string Code { get; }
     Guid? PromotionId { get; }

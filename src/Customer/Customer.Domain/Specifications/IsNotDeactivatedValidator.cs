@@ -1,16 +1,13 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Specifications;
+
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the customer account has not been deactivated.
 /// </summary>
-public sealed class IsNotDeactivatedValidator : IBusinessOperationValidator<ICustomer, ICustomerAnemicModel>
+public sealed class IsNotDeactivatedValidator
 {
-    private IsNotDeactivatedValidator()
-    {
-    }
+    private IsNotDeactivatedValidator() { }
 
     public static IsNotDeactivatedValidator CreateInstance()
     {
@@ -22,5 +19,5 @@ public sealed class IsNotDeactivatedValidator : IBusinessOperationValidator<ICus
         return model.Root.Status != "Deactivated";
     }
 
-    public string ErrorMessage => "Customer account has been deactivated.";
+    public string Reason => "Customer account has been deactivated.";
 }

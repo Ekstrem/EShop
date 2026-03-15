@@ -3,7 +3,11 @@ using Customer.Domain.Abstraction;
 using Customer.Domain.Implementation;
 using Customer.Domain.Specifications;
 using Customer.DomainServices;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 
 namespace Customer.Application.Commands;
@@ -29,7 +33,7 @@ public sealed class VerifyEmailCommandHandler
 
         var validator = IsUnverifiedValidator.CreateInstance();
         if (!validator.IsSatisfiedBy(current))
-            throw new InvalidOperationException(validator.ErrorMessage);
+            throw new InvalidOperationException(validator.Reason);
 
         var result = CustomerAggregate.VerifyEmail(current);
         await _notifier.HandleAsync(result, ct);

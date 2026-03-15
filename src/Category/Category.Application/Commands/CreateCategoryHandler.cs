@@ -1,7 +1,9 @@
 namespace Category.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using EShop.Contracts;
 using Category.Domain;
 using Category.Domain.Abstraction;
 using Category.Domain.Implementation;
@@ -29,7 +31,7 @@ public sealed class CreateCategoryHandler
         {
             var parent = await _queryRepository.GetByIdAsync(request.ParentId.Value, cancellationToken);
             if (parent is null)
-                return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Parent category not found.");
+                return AggregateResultExtensions.FailResult<ICategory, ICategoryAnemicModel>("Parent category not found.");
             depth = parent.Depth + 1;
         }
 

@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using AggregateRating.Domain.Implementation;
 using Xunit;
 
@@ -30,10 +31,10 @@ public sealed class AggregateRatingAggregateTests
 
         var result = aggregate.InitializeRating(productId);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal(productId, result.Model.Root.ProductId);
-        Assert.Equal("Pending", result.Model.Root.Status);
-        Assert.Equal(0, result.Model.Root.TotalReviews);
+        Assert.True(result.IsSuccess());
+        Assert.Equal(productId, result.Model().Root.ProductId);
+        Assert.Equal("Pending", result.Model().Root.Status);
+        Assert.Equal(0, result.Model().Root.TotalReviews);
     }
 
     [Fact]
@@ -47,9 +48,9 @@ public sealed class AggregateRatingAggregateTests
             totalVerifiedRatingSum: 9,
             totalUnverifiedRatingSum: 3);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Active", result.Model.Root.Status);
-        Assert.Equal(3, result.Model.Root.TotalReviews);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Active", result.Model().Root.Status);
+        Assert.Equal(3, result.Model().Root.TotalReviews);
     }
 
     [Fact]
@@ -63,9 +64,9 @@ public sealed class AggregateRatingAggregateTests
             totalVerifiedRatingSum: 5,
             totalUnverifiedRatingSum: 4);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Pending", result.Model.Root.Status);
-        Assert.Equal(2, result.Model.Root.TotalReviews);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Pending", result.Model().Root.Status);
+        Assert.Equal(2, result.Model().Root.TotalReviews);
     }
 
     [Fact]
@@ -80,8 +81,8 @@ public sealed class AggregateRatingAggregateTests
             totalVerifiedRatingSum: 14,
             totalUnverifiedRatingSum: 5);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal(3.8m, result.Model.Root.AverageRating);
+        Assert.True(result.IsSuccess());
+        Assert.Equal(3.8m, result.Model().Root.AverageRating);
     }
 
     [Fact]
@@ -97,8 +98,8 @@ public sealed class AggregateRatingAggregateTests
             totalVerifiedRatingSum: 12,
             totalUnverifiedRatingSum: 2);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal(3.7m, result.Model.WeightedAverage);
+        Assert.True(result.IsSuccess());
+        Assert.Equal(3.7m, result.Model().WeightedAverage);
     }
 
     [Fact]
@@ -112,12 +113,12 @@ public sealed class AggregateRatingAggregateTests
             totalVerifiedRatingSum: 35,
             totalUnverifiedRatingSum: 30);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal(20, result.Model.Root.TotalReviews);
+        Assert.True(result.IsSuccess());
+        Assert.Equal(20, result.Model().Root.TotalReviews);
 
-        var dist = result.Model.Distribution;
+        var dist = result.Model().Distribution;
         var sum = dist.OneStar + dist.TwoStar + dist.ThreeStar + dist.FourStar + dist.FiveStar;
-        Assert.Equal(result.Model.Root.TotalReviews, sum);
+        Assert.Equal(result.Model().Root.TotalReviews, sum);
     }
 
     [Fact]
@@ -131,8 +132,8 @@ public sealed class AggregateRatingAggregateTests
             totalVerifiedRatingSum: 0,
             totalUnverifiedRatingSum: 0);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal(0m, result.Model.Root.AverageRating);
-        Assert.Equal("Pending", result.Model.Root.Status);
+        Assert.True(result.IsSuccess());
+        Assert.Equal(0m, result.Model().Root.AverageRating);
+        Assert.Equal("Pending", result.Model().Root.Status);
     }
 }

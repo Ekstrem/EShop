@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Shipment.Domain.Abstraction;
 
 namespace Shipment.Domain.Specifications;
@@ -6,10 +5,10 @@ namespace Shipment.Domain.Specifications;
 /// <summary>
 /// Validates that the shipment contains at least one item.
 /// </summary>
-public sealed class HasItemsValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
+internal sealed class HasItemsValidator
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Items.Count >= 1;
 
-    public string ErrorMessage => "Shipment must contain at least one item.";
+    public string Reason => "Shipment must contain at least one item.";
 }

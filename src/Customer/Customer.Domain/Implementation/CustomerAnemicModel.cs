@@ -1,12 +1,12 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Implementation;
+
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Immutable anemic model for the Customer aggregate.
 /// </summary>
-public sealed class CustomerAnemicModel : AnemicModel<ICustomer>, ICustomerAnemicModel
+public sealed class CustomerAnemicModel : ICustomerAnemicModel
 {
     private CustomerAnemicModel(
         Guid id,
@@ -21,9 +21,21 @@ public sealed class CustomerAnemicModel : AnemicModel<ICustomer>, ICustomerAnemi
     }
 
     public Guid Id { get; }
+    public long Version { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    public string CommandName { get; set; } = string.Empty;
+    public string SubjectName { get; set; } = string.Empty;
+    public Guid CorrelationToken { get; set; } = Guid.NewGuid();
     public ICustomerRoot Root { get; }
     public IAddressBook AddressBook { get; }
     public IReadOnlyList<IConsent> Consents { get; }
+
+    public IDictionary<string, IValueObject> Invariants => GetValueObjects();
+    public IDictionary<string, IValueObject> GetValueObjects() =>
+        new Dictionary<string, IValueObject>
+        {
+            ["Root"] = Root,
+            ["AddressBook"] = AddressBook
+        };
 
     public static CustomerAnemicModel CreateInstance(
         Guid id,

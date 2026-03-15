@@ -1,8 +1,9 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
-using ReturnRequest.Domain.Specifications;
+using ReturnRequest.Domain.Implementation;
 using ReturnRequest.DomainServices;
 
 namespace ReturnRequest.Application.Commands;
@@ -31,16 +32,16 @@ public sealed class ReceiveReturnCommandHandler
         ReceiveReturnCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model!);
 
-        var isReturnShippedValidator = new IsReturnShippedValidator();
+        var result = aggregate.ReceiveReturn();
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.CreateInstance(
-            "ReceiveReturn",
-            $"Return request {request.ReturnRequestId} received.");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        if (result.IsSuccess())
+        {
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

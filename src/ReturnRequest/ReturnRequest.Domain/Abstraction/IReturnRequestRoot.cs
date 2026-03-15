@@ -1,12 +1,13 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 namespace ReturnRequest.Domain.Abstraction;
 
 /// <summary>
 /// Aggregate root for the ReturnRequest bounded context.
 /// </summary>
-public interface IReturnRequestRoot : IAggregateRoot<IReturnRequest>
+public interface IReturnRequestRoot : IValueObject
 {
+    Guid Id { get; }
     Guid OrderId { get; }
     Guid CustomerId { get; }
     string RmaNumber { get; }

@@ -15,13 +15,13 @@ public sealed class IsNotDeliveredValidatorTests
     public void IsValid_WhenNotDelivered_ReturnsTrue(string status)
     {
         var model = TestAnemicModelBuilder.Build(status: status);
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Fact]
     public void IsValid_WhenDelivered_ReturnsFalse()
     {
         var model = TestAnemicModelBuilder.Build(status: "Delivered");
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

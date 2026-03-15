@@ -1,10 +1,8 @@
 namespace StockItem.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
-
-internal sealed class NonNegativeReservedValidator : IBusinessOperationValidator<int>
+internal sealed class NonNegativeReservedValidator
 {
     public bool IsSatisfiedBy(int reserved) => reserved >= 0;
 
-    public string ErrorMessage => "Reserved quantity cannot be negative.";
+    public string Reason => "Reserved quantity cannot be negative.";
 }

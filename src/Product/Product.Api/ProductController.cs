@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Product.Api;
 
 using MediatR;
@@ -23,10 +24,10 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Value);
+        return Ok(result.Model());
     }
 
     [HttpPut("{id:guid}")]
@@ -37,10 +38,10 @@ public sealed class ProductController : ControllerBase
     {
         var cmd = command with { ProductId = id };
         var result = await _mediator.Send(cmd, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Value);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/publish")]
@@ -49,10 +50,10 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new PublishProductCommand(id), cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Value);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/archive")]
@@ -61,10 +62,10 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new ArchiveProductCommand(id), cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Value);
+        return Ok(result.Model());
     }
 
     [HttpGet("{id:guid}")]

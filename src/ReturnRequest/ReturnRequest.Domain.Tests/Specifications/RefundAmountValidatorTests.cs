@@ -14,7 +14,7 @@ public sealed class RefundAmountValidatorTests
             itemCount: 2,
             unitPrice: 25.00m,
             refundAmount: 50.00m);
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public sealed class RefundAmountValidatorTests
             itemCount: 2,
             unitPrice: 25.00m,
             refundAmount: 30.00m);
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public sealed class RefundAmountValidatorTests
             itemCount: 1,
             unitPrice: 25.00m,
             refundAmount: 50.00m);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class RefundAmountValidatorTests
             itemCount: 1,
             unitPrice: 25.00m,
             refundAmount: 0m);
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -54,6 +54,6 @@ public sealed class RefundAmountValidatorTests
             itemCount: 1,
             unitPrice: 25.00m,
             refundAmount: -5.00m);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

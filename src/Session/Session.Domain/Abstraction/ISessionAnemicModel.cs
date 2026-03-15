@@ -1,6 +1,6 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Session.Domain.Abstraction;
+
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 /// <summary>
 /// Anemic model contract for the Session aggregate.

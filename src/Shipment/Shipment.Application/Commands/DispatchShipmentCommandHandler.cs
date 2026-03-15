@@ -1,15 +1,13 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
-using Shipment.Domain.Specifications;
+using Shipment.Domain.Implementation;
 using Shipment.DomainServices;
 
 namespace Shipment.Application.Commands;
 
-/// <summary>
-/// Handles the DispatchShipmentCommand.
-/// </summary>
 public sealed class DispatchShipmentCommandHandler
     : IRequestHandler<DispatchShipmentCommand, AggregateResult<IShipment, IShipmentAnemicModel>>
 {
@@ -31,18 +29,16 @@ public sealed class DispatchShipmentCommandHandler
         DispatchShipmentCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ShipmentId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ShipmentId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model);
 
-        var isPackedValidator = new IsPackedValidator();
-        var hasTrackingValidator = new HasTrackingNumberValidator();
-        var hasLabelValidator = new HasLabelValidator();
+        var result = aggregate.DispatchShipment(request.TrackingNumber, request.LabelUrl);
 
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "DispatchShipment",
-            $"Shipment {request.ShipmentId} dispatched with tracking {request.TrackingNumber}.");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        if (result.IsSuccess())
+        {
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

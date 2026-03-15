@@ -1,16 +1,13 @@
-using Hive.SeedWorks.TacticalPatterns;
-using Session.Domain.Abstraction;
-
 namespace Session.Domain.Specifications;
+
+using Session.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the session is in Active status.
 /// </summary>
-public sealed class IsActiveSessionValidator : IBusinessOperationValidator<ISession, ISessionAnemicModel>
+public sealed class IsActiveSessionValidator
 {
-    private IsActiveSessionValidator()
-    {
-    }
+    private IsActiveSessionValidator() { }
 
     public static IsActiveSessionValidator CreateInstance()
     {
@@ -22,5 +19,5 @@ public sealed class IsActiveSessionValidator : IBusinessOperationValidator<ISess
         return model.Root.Status == "Active";
     }
 
-    public string ErrorMessage => "Session must be in Active status.";
+    public string Reason => "Session must be in Active status.";
 }

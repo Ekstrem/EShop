@@ -11,13 +11,13 @@ public sealed class HasItemsValidatorTests
     public void IsValid_WhenItemsExist_ReturnsTrue()
     {
         var model = TestAnemicModelBuilder.Build(itemCount: 2);
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Fact]
     public void IsValid_WhenNoItems_ReturnsFalse()
     {
         var model = TestAnemicModelBuilder.Build(itemCount: 0);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

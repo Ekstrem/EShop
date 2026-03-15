@@ -1,4 +1,8 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 using Session.Domain;
 using Session.Domain.Abstraction;
@@ -29,7 +33,7 @@ public sealed class RevokeSessionCommandHandler
 
         var activeValidator = IsActiveSessionValidator.CreateInstance();
         if (!activeValidator.IsSatisfiedBy(current))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         var result = SessionAggregate.RevokeSession(current);
         await _notifier.HandleAsync(result, ct);

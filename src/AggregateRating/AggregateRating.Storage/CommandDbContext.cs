@@ -1,6 +1,8 @@
 namespace AggregateRating.Storage;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using AggregateRating.Domain;
 using AggregateRating.Domain.Abstraction;
 
@@ -9,7 +11,7 @@ using AggregateRating.Domain.Abstraction;
 /// </summary>
 public sealed class CommandDbContext : ICommandDbContext<IAggregateRating>
 {
-    public Task SaveAsync(IAggregateRatingAnemicModel model, CancellationToken cancellationToken = default)
+    public Task SaveAsync(IAnemicModel<IAggregateRating> model, CancellationToken cancellationToken = default)
     {
         // Persist aggregate state to command store (PostgreSQL, etc.)
         return Task.CompletedTask;

@@ -1,7 +1,11 @@
 using Autofac;
 using Customer.Domain;
 using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 
 namespace Customer.DomainServices;
 

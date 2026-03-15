@@ -1,14 +1,19 @@
 namespace DiscountCode.DomainServices;
 
-using Hive.SeedWorks.Events;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using DiscountCode.Domain;
 
 public sealed class Notifier : INotifier<IDiscountCode>
 {
-    public Task Notify<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-        where TEvent : IDomainEvent<IDiscountCode>
+    public void Notify<TModel>(AggregateResult<IDiscountCode, TModel> result)
+        where TModel : IAnemicModel<IDiscountCode>
     {
         // Push notifications to subscribers (SignalR, WebSocket, etc.)
-        return Task.CompletedTask;
     }
 }

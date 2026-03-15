@@ -1,12 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet new:*)",
-      "Bash(bash generate-structure.sh)",
-      "Bash(ls /c/Python*)",
-      "Read(//c/Users/About/AppData/Local/Programs/**)",
-      "Bash(\"/c/Program Files/Python312/python.exe\" --version)",
-      "Bash(py --version)"
+      "Read(*)",
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Edit(*)",
+      "Bash(dotnet build:*)",
+      "Read(//c/Users/About/Documents/GitHub/EShop/$USERPROFILE/.dotnet/**)",
+      "Bash(ls \"/c/Program Files \\(x86\\)/dotnet/sdk/\")",
+      "Bash(dotnet.exe --list-sdks)",
+      "Bash(dotnet.exe build:*)",
+      "Bash(\"/c/Program Files/dotnet/dotnet.exe\" --list-sdks)",
+      "Bash(\"$USERPROFILE/.dotnet/dotnet.exe\" build:*)",
+      "Bash(DOTNET=\"$HOME/.dotnet/dotnet.exe\")",
+      "Bash(\"$DOTNET\" build:*)",
+      "Bash(echo $HOME)",
+      "Bash(echo $USERPROFILE)",
+      "Read(//c/Users/About/.dotnet/**)",
+      "Bash(/c/Users/About/.dotnet/dotnet.exe build:*)",
+      "Bash(/c/Users/About/.dotnet/dotnet.exe test:*)"
     ]
   }
 }

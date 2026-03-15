@@ -1,10 +1,7 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace AggregateRating.Domain.Abstraction;
 
-/// <summary>
-/// Value object representing the distribution of ratings across star levels.
-/// </summary>
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+
 public interface IRatingDistribution : IValueObject
 {
     int OneStar { get; }

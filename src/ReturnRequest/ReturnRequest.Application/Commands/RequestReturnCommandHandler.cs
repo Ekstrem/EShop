@@ -1,8 +1,9 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
-using ReturnRequest.Domain.Specifications;
+using ReturnRequest.Domain.Implementation;
 using ReturnRequest.DomainServices;
 
 namespace ReturnRequest.Application.Commands;
@@ -26,15 +27,20 @@ public sealed class RequestReturnCommandHandler
         RequestReturnCommand request,
         CancellationToken cancellationToken)
     {
-        var hasReasonValidator = new HasReasonValidator();
-        var withinReturnPeriodValidator = new WithinReturnPeriodValidator(request.OrderDeliveredAt);
+        var aggregate = Aggregate.CreateInstance(new AnemicModel());
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.CreateInstance(
-            "RequestReturn",
-            $"Return requested for order {request.OrderId}.");
+        var items = request.Items
+            .Select(i => ReturnItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity, i.UnitPrice))
+            .ToList<IReturnItem>();
 
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        var result = aggregate.RequestReturn(
+            request.OrderId, request.CustomerId, request.Reason, items, request.OrderDeliveredAt);
+
+        if (result.IsSuccess())
+        {
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

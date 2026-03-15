@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using ReturnRequest.Domain.Abstraction;
 
 namespace ReturnRequest.Domain.Specifications;
@@ -6,10 +5,10 @@ namespace ReturnRequest.Domain.Specifications;
 /// <summary>
 /// Validates that the return request has a reason provided.
 /// </summary>
-public sealed class HasReasonValidator : IBusinessOperationValidator<IReturnRequest, IReturnRequestAnemicModel>
+internal sealed class HasReasonValidator
 {
-    public bool IsValid(IReturnRequestAnemicModel model)
+    public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
         => !string.IsNullOrWhiteSpace(model.Root.Reason);
 
-    public string ErrorMessage => "Return request must have a reason.";
+    public string Reason => "Return request must have a reason.";
 }

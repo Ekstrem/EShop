@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Invoice.Api;
 
 using MediatR;
@@ -23,10 +24,10 @@ public sealed class InvoiceController : ControllerBase
         CancellationToken ct)
     {
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{invoiceId:guid}/send")]
@@ -36,10 +37,10 @@ public sealed class InvoiceController : ControllerBase
     {
         var command = new SendInvoiceCommand { InvoiceId = invoiceId };
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{invoiceId:guid}/resend")]
@@ -49,10 +50,10 @@ public sealed class InvoiceController : ControllerBase
     {
         var command = new ResendInvoiceCommand { InvoiceId = invoiceId };
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{invoiceId:guid}/credit-note")]
@@ -69,10 +70,10 @@ public sealed class InvoiceController : ControllerBase
         };
 
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpGet("{invoiceId:guid}")]

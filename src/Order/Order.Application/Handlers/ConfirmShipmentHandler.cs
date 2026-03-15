@@ -1,6 +1,10 @@
 namespace Order.Application.Handlers;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Order.Domain;
 using Order.Domain.Abstraction;
 using Order.Domain.Aggregate;
@@ -31,7 +35,7 @@ public class ConfirmShipmentHandler : IRequestHandler<ConfirmShipmentCommand, Ag
 
         var validator = new IsPaidValidator();
         if (!validator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(validator.ErrorMessage);
+            throw new InvalidOperationException(validator.Reason);
 
         var result = OrderAggregate.ConfirmShipment(model);
 

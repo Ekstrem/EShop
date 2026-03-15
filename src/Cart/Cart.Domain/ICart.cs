@@ -1,11 +1,5 @@
 namespace Cart.Domain;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
 
 public interface ICart : IBoundedContext { }
-
-public class CartBoundedContextDescription : IBoundedContextDescription
-{
-    public string ContextName => "Cart";
-    public int MicroserviceVersion => 1;
-}
