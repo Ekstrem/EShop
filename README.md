@@ -1,7 +1,9 @@
 # Context Map — Интернет-магазин (E-Commerce)
 
 > **Принцип:** 1 ограниченный контекст = 1 агрегат
+> 
 > **Методология:** EventStorming → Subdomains → Bounded Contexts → Aggregates
+> 
 > **Дата:** 2026-03-14
 
 ---
