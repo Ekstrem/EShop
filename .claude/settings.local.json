@@ -18,7 +18,9 @@
       "Bash(echo $USERPROFILE)",
       "Read(//c/Users/About/.dotnet/**)",
       "Bash(/c/Users/About/.dotnet/dotnet.exe build:*)",
-      "Bash(/c/Users/About/.dotnet/dotnet.exe test:*)"
+      "Bash(/c/Users/About/.dotnet/dotnet.exe test:*)",
+      "Bash(/c/Users/About/.dotnet/dotnet.exe restore:*)",
+      "Bash(/c/Users/About/.dotnet/dotnet.exe sln:*)"
     ]
   }
 }

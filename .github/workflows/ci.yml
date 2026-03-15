@@ -26,9 +26,6 @@ jobs:
       with:
         dotnet-version: 8.0.4xx
 
-    - name: Authenticate GitHub NuGet
-      run: dotnet nuget update source github-ekstrem --username Ekstrem --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --configfile src/nuget.config
-
     - name: Restore dependencies
       run: dotnet restore EShop.sln
 
@@ -52,6 +49,13 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        profile:
+          - { name: Single, tag: single }
+          - { name: BudgetCqrs, tag: budget-cqrs }
+          - { name: Cqrs, tag: cqrs }
+          - { name: Ceqrs, tag: ceqrs }
 
     steps:
     - uses: actions/checkout@v4
@@ -69,10 +73,10 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=sha
-          type=raw,value=latest
+          type=raw,value=${{ matrix.profile.tag }}
+          type=sha,prefix=${{ matrix.profile.tag }}-
 
-    - name: Build and push Docker image
+    - name: Build and push Docker image (${{ matrix.profile.name }})
       uses: docker/build-push-action@v6
       with:
         context: .
@@ -80,4 +84,31 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          DEPLOYMENT_PROFILE=${{ matrix.profile.name }}
+
+  docker-latest:
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push latest (Single profile)
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        build-args: |
+          DEPLOYMENT_PROFILE=Single
