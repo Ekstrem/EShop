@@ -1,15 +1,33 @@
 namespace Invoice.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Invoice.Domain.Abstraction;
 using Invoice.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(IInvoiceAnemicModel model) : base(model) { }
+    public IInvoiceAnemicModel Model { get; }
+
+    private Aggregate(IInvoiceAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(IInvoiceAnemicModel model) => new(model);
+
+    private AggregateResult<IInvoice, IInvoiceAnemicModel> Success(IInvoiceAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IInvoice, IInvoiceAnemicModel>
+            .Commit<IInvoice, IInvoiceAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IInvoice, IInvoiceAnemicModel>(data);
+    }
+
+    private AggregateResult<IInvoice, IInvoiceAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IInvoice, IInvoiceAnemicModel>
+            .Commit<IInvoice, IInvoiceAnemicModel>(Model, Model);
+        return new AggregateResultException<IInvoice, IInvoiceAnemicModel>(
+            data, new FailedSpecification<IInvoice, IInvoiceAnemicModel>(error));
+    }
 
     public AggregateResult<IInvoice, IInvoiceAnemicModel> GenerateInvoice(
         string invoiceNumber,
@@ -19,13 +37,11 @@ internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
     {
         var fieldsValidator = new HasRequiredFieldsValidator();
         if (!fieldsValidator.IsSatisfiedBy(invoiceNumber, customerId, lines))
-            return AggregateResult<IInvoice, IInvoiceAnemicModel>.Fail(
-                "Invoice must have a number, customer, and at least one line with VAT.");
+            return Fail("Invoice must have a number, customer, and at least one line with VAT.");
 
         var sequentialValidator = new SequentialNumberValidator();
         if (!sequentialValidator.IsSatisfiedBy(invoiceNumber))
-            return AggregateResult<IInvoice, IInvoiceAnemicModel>.Fail(
-                "Invoice number must follow the sequential format.");
+            return Fail("Invoice number must follow the sequential format.");
 
         var root = InvoiceRoot.CreateInstance(
             invoiceNumber,
@@ -44,15 +60,14 @@ internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
             Totals = totals
         };
 
-        return AggregateResult<IInvoice, IInvoiceAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IInvoice, IInvoiceAnemicModel> SendInvoice()
     {
         var validator = new IsGeneratedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IInvoice, IInvoiceAnemicModel>.Fail(
-                "Only invoices in Generated status can be sent.");
+            return Fail("Only invoices in Generated status can be sent.");
 
         var root = InvoiceRoot.CreateInstance(
             Model.Root.InvoiceNumber,
@@ -69,15 +84,14 @@ internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
             Totals = Model.Totals
         };
 
-        return AggregateResult<IInvoice, IInvoiceAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IInvoice, IInvoiceAnemicModel> ResendInvoice()
     {
         var validator = new IsSentValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IInvoice, IInvoiceAnemicModel>.Fail(
-                "Only invoices in Sent status can be resent.");
+            return Fail("Only invoices in Sent status can be resent.");
 
         var root = InvoiceRoot.CreateInstance(
             Model.Root.InvoiceNumber,
@@ -94,7 +108,7 @@ internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
             Totals = Model.Totals
         };
 
-        return AggregateResult<IInvoice, IInvoiceAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IInvoice, IInvoiceAnemicModel> GenerateCreditNote(
@@ -103,13 +117,11 @@ internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
     {
         var immutableValidator = new InvoiceImmutableValidator();
         if (!immutableValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IInvoice, IInvoiceAnemicModel>.Fail(
-                "Cannot create a credit note for an invoice that is not yet generated.");
+            return Fail("Cannot create a credit note for an invoice that is not yet generated.");
 
         var sequentialValidator = new SequentialNumberValidator();
         if (!sequentialValidator.IsSatisfiedBy(creditNoteNumber))
-            return AggregateResult<IInvoice, IInvoiceAnemicModel>.Fail(
-                "Credit note number must follow the sequential format.");
+            return Fail("Credit note number must follow the sequential format.");
 
         var creditLine = InvoiceLine.CreateInstance(
             $"Credit note for invoice {Model.Root.InvoiceNumber}",
@@ -135,6 +147,6 @@ internal sealed class Aggregate : Aggregate<IInvoice, IInvoiceAnemicModel>
             Totals = totals
         };
 
-        return AggregateResult<IInvoice, IInvoiceAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

@@ -1,9 +1,8 @@
 namespace Campaign.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Campaign.Domain.Abstraction;
 
-internal sealed class ScheduleInFutureValidator : IBusinessOperationValidator<ICampaignAnemicModel>
+internal sealed class ScheduleInFutureValidator
 {
     private readonly DateTime _scheduledAt;
 
@@ -15,5 +14,5 @@ internal sealed class ScheduleInFutureValidator : IBusinessOperationValidator<IC
     public bool IsSatisfiedBy(ICampaignAnemicModel model)
         => _scheduledAt > DateTime.UtcNow;
 
-    public string ErrorMessage => "Scheduled date must be in the future.";
+    public string Reason => "Scheduled date must be in the future.";
 }

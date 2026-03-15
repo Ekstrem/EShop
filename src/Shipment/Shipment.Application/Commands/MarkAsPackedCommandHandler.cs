@@ -1,5 +1,8 @@
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
@@ -50,7 +53,7 @@ public sealed class MarkAsPackedCommandHandler
                 createdAt: DateTime.UtcNow)
         };
 
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.Create(model, "MarkAsPacked");
+        var result = AggregateResultExtensions.CreateResult<IShipment, IShipmentAnemicModel>(model, "MarkAsPacked");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
         _notifier.Notify(result);

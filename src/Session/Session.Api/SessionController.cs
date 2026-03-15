@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Session.Application.Commands;
@@ -27,12 +28,12 @@ public sealed class SessionController : ControllerBase
         var result = await _mediator.Send(command, ct);
         return CreatedAtAction(
             nameof(GetActiveSessions),
-            new { customerId = result.Model.Root.CustomerId },
+            new { customerId = result.Model().Root.CustomerId },
             new
             {
-                SessionId = result.Model.Id,
-                Token = result.Model.Root.Token,
-                ExpiresAt = result.Model.Root.ExpiresAt
+                SessionId = result.Model().Id,
+                Token = result.Model().Root.Token,
+                ExpiresAt = result.Model().Root.ExpiresAt
             });
     }
 
@@ -47,9 +48,9 @@ public sealed class SessionController : ControllerBase
         var result = await _mediator.Send(command, ct);
         return Ok(new
         {
-            SessionId = result.Model.Id,
-            Token = result.Model.Root.Token,
-            ExpiresAt = result.Model.Root.ExpiresAt
+            SessionId = result.Model().Id,
+            Token = result.Model().Root.Token,
+            ExpiresAt = result.Model().Root.ExpiresAt
         });
     }
 

@@ -1,7 +1,10 @@
 namespace Cart.Application.Handlers;
 
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 using Cart.Domain.Aggregate;
@@ -32,7 +35,7 @@ public class ApplyPromoCodeHandler : IRequestHandler<ApplyPromoCodeCommand, Aggr
 
         var activeValidator = new IsActiveCartValidator();
         if (!activeValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         if (string.IsNullOrWhiteSpace(request.Code))
             throw new InvalidOperationException("Promo code cannot be empty.");

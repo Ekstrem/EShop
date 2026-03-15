@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using Xunit;
 using Notification.Domain;
 using Notification.Domain.Abstraction;
@@ -17,7 +18,7 @@ public sealed class NotificationJourneyTests
     /// Creates a notification aggregate, renders, and sends it (transactional type).
     /// Returns the final send result.
     /// </summary>
-    private static Hive.SeedWorks.Result.AggregateResult<INotification, INotificationAnemicModel>
+    private static DigiTFactory.Libraries.SeedWorks.Result.AggregateResult<INotification, INotificationAnemicModel>
         CreateRenderAndSend(Guid customerId, Guid eventId, string channel, string templateId)
     {
         // Create
@@ -26,20 +27,20 @@ public sealed class NotificationJourneyTests
         var createResult = aggregate.CreateNotification(
             customerId, eventId, channel, templateId, "en-US", "Transactional");
 
-        if (!createResult.IsSuccess)
+        if (!createResult.IsSuccess())
             return createResult;
 
         // Render
-        var createdAggregate = Aggregate.CreateInstance(createResult.Model!);
+        var createdAggregate = Aggregate.CreateInstance(createResult.Model()!);
         var renderResult = createdAggregate.Render(
             renderedContent: $"<html><body>Notification for event {eventId}</body></html>",
             subject: "Your order update");
 
-        if (!renderResult.IsSuccess)
+        if (!renderResult.IsSuccess())
             return renderResult;
 
         // Send (transactional notifications do not require consent)
-        var renderedAggregate = Aggregate.CreateInstance(renderResult.Model!);
+        var renderedAggregate = Aggregate.CreateInstance(renderResult.Model()!);
         return renderedAggregate.Send(hasConsent: true);
     }
 
@@ -55,10 +56,10 @@ public sealed class NotificationJourneyTests
             customerId, orderPlacedEventId, "Email", "tmpl-order-placed");
 
         // Assert
-        Assert.True(sendResult.IsSuccess, $"OrderPlaced notification failed: {sendResult.ErrorMessage}");
-        Assert.Equal("Sent", sendResult.Model!.Root.Status);
-        Assert.Equal("Transactional", sendResult.Model.Root.Type);
-        Assert.Equal(customerId, sendResult.Model.Root.CustomerId);
+        Assert.True(sendResult.IsSuccess(), $"OrderPlaced notification failed: {sendResult.ErrorMessage()}");
+        Assert.Equal("Sent", sendResult.Model()!.Root.Status);
+        Assert.Equal("Transactional", sendResult.Model().Root.Type);
+        Assert.Equal(customerId, sendResult.Model().Root.CustomerId);
     }
 
     [Fact]
@@ -73,9 +74,9 @@ public sealed class NotificationJourneyTests
             customerId, paymentCompletedEventId, "Email", "tmpl-payment-completed");
 
         // Assert
-        Assert.True(sendResult.IsSuccess, $"PaymentCompleted notification failed: {sendResult.ErrorMessage}");
-        Assert.Equal("Sent", sendResult.Model!.Root.Status);
-        Assert.Equal("Transactional", sendResult.Model.Root.Type);
+        Assert.True(sendResult.IsSuccess(), $"PaymentCompleted notification failed: {sendResult.ErrorMessage()}");
+        Assert.Equal("Sent", sendResult.Model()!.Root.Status);
+        Assert.Equal("Transactional", sendResult.Model().Root.Type);
     }
 
     [Fact]
@@ -91,23 +92,23 @@ public sealed class NotificationJourneyTests
         var createResult = aggregate.CreateNotification(
             customerId, campaignEventId, "Email", "tmpl-campaign-promo", "en-US", "Marketing");
 
-        Assert.True(createResult.IsSuccess, $"CreateNotification failed: {createResult.ErrorMessage}");
-        Assert.Equal("Created", createResult.Model!.Root.Status);
+        Assert.True(createResult.IsSuccess(), $"CreateNotification failed: {createResult.ErrorMessage()}");
+        Assert.Equal("Created", createResult.Model()!.Root.Status);
 
         // Step 2: Render the notification
-        var createdAggregate = Aggregate.CreateInstance(createResult.Model);
+        var createdAggregate = Aggregate.CreateInstance(createResult.Model());
         var renderResult = createdAggregate.Render(
             renderedContent: "<html><body>Special offer for you!</body></html>",
             subject: "Limited Time Offer");
 
-        Assert.True(renderResult.IsSuccess, $"Render failed: {renderResult.ErrorMessage}");
-        Assert.Equal("Rendered", renderResult.Model!.Root.Status);
+        Assert.True(renderResult.IsSuccess(), $"Render failed: {renderResult.ErrorMessage()}");
+        Assert.Equal("Rendered", renderResult.Model()!.Root.Status);
 
         // Step 3: Simulate failure — send without consent for marketing
-        var renderedAggregate = Aggregate.CreateInstance(renderResult.Model);
+        var renderedAggregate = Aggregate.CreateInstance(renderResult.Model());
         var failedSendResult = renderedAggregate.Send(hasConsent: false);
 
-        Assert.False(failedSendResult.IsSuccess, "Marketing send without consent should fail");
+        Assert.False(failedSendResult.IsSuccess(), "Marketing send without consent should fail");
 
         // Step 4: To simulate retry, we construct a Failed notification model
         // (In production, the status would be set to Failed by the infrastructure)
@@ -132,25 +133,25 @@ public sealed class NotificationJourneyTests
         var failedAggregate = Aggregate.CreateInstance(failedModel);
         var retryResult = failedAggregate.Retry();
 
-        Assert.True(retryResult.IsSuccess, $"Retry failed: {retryResult.ErrorMessage}");
-        Assert.Equal("Created", retryResult.Model!.Root.Status);
-        Assert.Equal(1, retryResult.Model.Root.RetryCount);
+        Assert.True(retryResult.IsSuccess(), $"Retry failed: {retryResult.ErrorMessage()}");
+        Assert.Equal("Created", retryResult.Model()!.Root.Status);
+        Assert.Equal(1, retryResult.Model().Root.RetryCount);
 
         // Step 6: Re-render after retry
-        var retriedAggregate = Aggregate.CreateInstance(retryResult.Model);
+        var retriedAggregate = Aggregate.CreateInstance(retryResult.Model());
         var reRenderResult = retriedAggregate.Render(
             renderedContent: "<html><body>Special offer for you!</body></html>",
             subject: "Limited Time Offer");
 
-        Assert.True(reRenderResult.IsSuccess, $"Re-render failed: {reRenderResult.ErrorMessage}");
-        Assert.Equal("Rendered", reRenderResult.Model!.Root.Status);
+        Assert.True(reRenderResult.IsSuccess(), $"Re-render failed: {reRenderResult.ErrorMessage()}");
+        Assert.Equal("Rendered", reRenderResult.Model()!.Root.Status);
 
         // Step 7: Send with consent this time
-        var reRenderedAggregate = Aggregate.CreateInstance(reRenderResult.Model);
+        var reRenderedAggregate = Aggregate.CreateInstance(reRenderResult.Model());
         var finalSendResult = reRenderedAggregate.Send(hasConsent: true);
 
-        Assert.True(finalSendResult.IsSuccess, $"Final send failed: {finalSendResult.ErrorMessage}");
-        Assert.Equal("Sent", finalSendResult.Model!.Root.Status);
-        Assert.Equal(1, finalSendResult.Model.Root.RetryCount);
+        Assert.True(finalSendResult.IsSuccess(), $"Final send failed: {finalSendResult.ErrorMessage()}");
+        Assert.Equal("Sent", finalSendResult.Model()!.Root.Status);
+        Assert.Equal(1, finalSendResult.Model().Root.RetryCount);
     }
 }

@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using Xunit;
 using Category.Domain.Abstraction;
 using Category.Domain.Implementation;
@@ -27,7 +28,8 @@ using AggregateRating.Domain.Abstraction;
 using AggregateRating.Domain.Implementation;
 using Notification.Domain.Abstraction;
 using Notification.Domain.Implementation;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 
 namespace EShop.IntegrationTests;
 
@@ -52,15 +54,15 @@ public sealed class FullEndToEndJourneyTests
         var parentCatResult = catAggregate.CreateCategory(
             "Electronics", parentId: null, depth: 0, sortOrder: 1,
             siblingNames: new List<string>());
-        Assert.True(parentCatResult.IsSuccess, $"CreateCategory (parent) failed: {parentCatResult.ErrorMessage}");
-        Assert.Equal("Active", parentCatResult.Model!.Root.Status);
+        Assert.True(parentCatResult.IsSuccess(), $"CreateCategory (parent) failed: {parentCatResult.ErrorMessage()}");
+        Assert.Equal("Active", parentCatResult.Model()!.Root.Status);
 
         var childCatAggregate = Category.Domain.Implementation.Aggregate.CreateInstance(
             new Category.Domain.Implementation.AnemicModel());
         var childCatResult = childCatAggregate.CreateCategory(
             "Smartphones", parentId: Guid.NewGuid(), depth: 1, sortOrder: 1,
             siblingNames: new List<string>());
-        Assert.True(childCatResult.IsSuccess, $"CreateCategory (child) failed: {childCatResult.ErrorMessage}");
+        Assert.True(childCatResult.IsSuccess(), $"CreateCategory (child) failed: {childCatResult.ErrorMessage()}");
         participatedContexts.Add("Category");
 
         var categoryId = Guid.NewGuid(); // simulated persisted ID
@@ -78,13 +80,13 @@ public sealed class FullEndToEndJourneyTests
             categoryId,
             new List<IProductVariant> { variant },
             new List<IProductMedia> { media });
-        Assert.True(createProdResult.IsSuccess, $"CreateProduct failed: {createProdResult.ErrorMessage}");
-        Assert.Equal("Draft", createProdResult.Model!.Root.Status);
+        Assert.True(createProdResult.IsSuccess(), $"CreateProduct failed: {createProdResult.ErrorMessage()}");
+        Assert.Equal("Draft", createProdResult.Model()!.Root.Status);
 
-        var draftProdAggregate = Product.Domain.Implementation.Aggregate.CreateInstance(createProdResult.Model);
+        var draftProdAggregate = Product.Domain.Implementation.Aggregate.CreateInstance(createProdResult.Model());
         var publishResult = draftProdAggregate.PublishProduct();
-        Assert.True(publishResult.IsSuccess, $"PublishProduct failed: {publishResult.ErrorMessage}");
-        Assert.Equal("Published", publishResult.Model!.Root.Status);
+        Assert.True(publishResult.IsSuccess(), $"PublishProduct failed: {publishResult.ErrorMessage()}");
+        Assert.Equal("Published", publishResult.Model()!.Root.Status);
         participatedContexts.Add("Product");
 
         var productId = Guid.NewGuid();
@@ -104,24 +106,24 @@ public sealed class FullEndToEndJourneyTests
         // ── 4. Customer: Register and verify ────────────────────────────
         var registerResult = CustomerAggregate.RegisterCustomer(
             "john.doe@example.com", "John", "Doe", "hashed-password-123");
-        Assert.True(registerResult.IsSuccess, $"RegisterCustomer failed: {registerResult.ErrorMessage}");
-        Assert.Equal("Unverified", registerResult.Model!.Root.Status);
+        Assert.True(registerResult.IsSuccess(), $"RegisterCustomer failed: {registerResult.ErrorMessage()}");
+        Assert.Equal("Unverified", registerResult.Model()!.Root.Status);
 
-        var verifyResult = CustomerAggregate.VerifyEmail(registerResult.Model);
-        Assert.True(verifyResult.IsSuccess, $"VerifyEmail failed: {verifyResult.ErrorMessage}");
-        Assert.Equal("Active", verifyResult.Model!.Root.Status);
+        var verifyResult = CustomerAggregate.VerifyEmail(registerResult.Model());
+        Assert.True(verifyResult.IsSuccess(), $"VerifyEmail failed: {verifyResult.ErrorMessage()}");
+        Assert.Equal("Active", verifyResult.Model()!.Root.Status);
         participatedContexts.Add("Customer");
 
-        var customerId = verifyResult.Model.Root.Id;
+        var customerId = verifyResult.Model().Root.Id;
 
         // ── 5. Session: Create session ──────────────────────────────────
         var sessionResult = SessionAggregate.CreateSession(
             customerId, "jwt-token-abc123", TimeSpan.FromHours(2), "Chrome/Windows");
-        Assert.True(sessionResult.IsSuccess, $"CreateSession failed: {sessionResult.ErrorMessage}");
-        Assert.Equal("Active", sessionResult.Model!.Root.Status);
+        Assert.True(sessionResult.IsSuccess(), $"CreateSession failed: {sessionResult.ErrorMessage()}");
+        Assert.Equal("Active", sessionResult.Model()!.Root.Status);
         participatedContexts.Add("Session");
 
-        var sessionId = sessionResult.Model.Root.Id;
+        var sessionId = sessionResult.Model().Root.Id;
 
         // ── 6. Cart: Add to cart, apply discount ────────────────────────
         var cartRoot = CartRoot.CreateInstance(customerId, sessionId);
@@ -135,8 +137,8 @@ public sealed class FullEndToEndJourneyTests
 
         var addItemResult = CartAggregate.AddItemToCart(
             cartModel, variantId, "Galaxy Phone Pro", "SKU-PHONE-001", 1, 999.99m);
-        Assert.True(addItemResult.IsSuccess, $"AddItemToCart failed: {addItemResult.ErrorMessage}");
-        Assert.Single(addItemResult.Model!.Items);
+        Assert.True(addItemResult.IsSuccess(), $"AddItemToCart failed: {addItemResult.ErrorMessage()}");
+        Assert.Single(addItemResult.Model()!.Items);
         participatedContexts.Add("Cart");
 
         // ── 6b. DiscountCode + Promotion: Apply promo ───────────────────
@@ -147,11 +149,11 @@ public sealed class FullEndToEndJourneyTests
             "Launch Discount", "10% off phones", "Percentage", 10m,
             DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(30),
             "Smartphones only", false);
-        Assert.True(createPromoResult.IsSuccess, $"CreatePromotion failed: {createPromoResult.ErrorMessage}");
+        Assert.True(createPromoResult.IsSuccess(), $"CreatePromotion failed: {createPromoResult.ErrorMessage()}");
 
-        var activatePromoAggregate = Promotion.Domain.Implementation.Aggregate.CreateInstance(createPromoResult.Model!);
+        var activatePromoAggregate = Promotion.Domain.Implementation.Aggregate.CreateInstance(createPromoResult.Model()!);
         var activatePromoResult = activatePromoAggregate.ActivatePromotion();
-        Assert.True(activatePromoResult.IsSuccess, $"ActivatePromotion failed: {activatePromoResult.ErrorMessage}");
+        Assert.True(activatePromoResult.IsSuccess(), $"ActivatePromotion failed: {activatePromoResult.ErrorMessage()}");
         participatedContexts.Add("Promotion");
 
         // Generate discount code
@@ -159,19 +161,19 @@ public sealed class FullEndToEndJourneyTests
         var codeAggregate = DiscountCode.Domain.Implementation.Aggregate.CreateInstance(codeModel);
         var genCodeResult = codeAggregate.GenerateDiscountCode(
             "LAUNCH10", Guid.NewGuid(), maxUsage: 1000, expiresAt: DateTime.UtcNow.AddDays(30));
-        Assert.True(genCodeResult.IsSuccess, $"GenerateDiscountCode failed: {genCodeResult.ErrorMessage}");
+        Assert.True(genCodeResult.IsSuccess(), $"GenerateDiscountCode failed: {genCodeResult.ErrorMessage()}");
         participatedContexts.Add("DiscountCode");
 
         // Apply promo to cart
         var applyPromoResult = CartAggregate.ApplyPromoCode(
-            addItemResult.Model, "LAUNCH10", discountPercent: 10m, discountAmount: 100m);
-        Assert.True(applyPromoResult.IsSuccess, $"ApplyPromoCode failed: {applyPromoResult.ErrorMessage}");
-        Assert.NotNull(applyPromoResult.Model!.AppliedPromoCode);
+            addItemResult.Model(), "LAUNCH10", discountPercent: 10m, discountAmount: 100m);
+        Assert.True(applyPromoResult.IsSuccess(), $"ApplyPromoCode failed: {applyPromoResult.ErrorMessage()}");
+        Assert.NotNull(applyPromoResult.Model()!.AppliedPromoCode);
 
         // ── 7. Order: Place order ───────────────────────────────────────
-        var placeOrderCartResult = CartAggregate.PlaceOrder(applyPromoResult.Model);
-        Assert.True(placeOrderCartResult.IsSuccess, $"PlaceOrder (Cart) failed: {placeOrderCartResult.ErrorMessage}");
-        Assert.Equal("CheckedOut", placeOrderCartResult.Model!.Root.Status);
+        var placeOrderCartResult = CartAggregate.PlaceOrder(applyPromoResult.Model());
+        Assert.True(placeOrderCartResult.IsSuccess(), $"PlaceOrder (Cart) failed: {placeOrderCartResult.ErrorMessage()}");
+        Assert.Equal("CheckedOut", placeOrderCartResult.Model()!.Root.Status);
 
         // Build Order model from cart data
         var orderId = Guid.NewGuid();
@@ -193,27 +195,27 @@ public sealed class FullEndToEndJourneyTests
         // ── 8. StockItem: Reserve stock ─────────────────────────────────
         var stockAggregate = StockItem.Domain.Implementation.Aggregate.CreateInstance(stockModel);
         var reserveResult = stockAggregate.ReserveStock(orderId, quantity: 1);
-        Assert.True(reserveResult.IsSuccess, $"ReserveStock failed: {reserveResult.ErrorMessage}");
-        Assert.Equal(1, reserveResult.Model!.Root.Reserved);
+        Assert.True(reserveResult.IsSuccess(), $"ReserveStock failed: {reserveResult.ErrorMessage()}");
+        Assert.Equal(1, reserveResult.Model()!.Root.Reserved);
 
         // ── 8b. Payment: Initiate and complete payment ──────────────────
         var payModel = new Payment.Domain.Implementation.AnemicModel();
         var payAggregate = Payment.Domain.Implementation.Aggregate.CreateInstance(payModel);
         var initiateResult = payAggregate.InitiatePayment(
             orderId, 909.98m, "USD", "CreditCard");
-        Assert.True(initiateResult.IsSuccess, $"InitiatePayment failed: {initiateResult.ErrorMessage}");
-        Assert.Equal("Initiated", initiateResult.Model!.Root.Status);
+        Assert.True(initiateResult.IsSuccess(), $"InitiatePayment failed: {initiateResult.ErrorMessage()}");
+        Assert.Equal("Initiated", initiateResult.Model()!.Root.Status);
 
-        var initiatedPayAggregate = Payment.Domain.Implementation.Aggregate.CreateInstance(initiateResult.Model);
+        var initiatedPayAggregate = Payment.Domain.Implementation.Aggregate.CreateInstance(initiateResult.Model());
         var captureResult = initiatedPayAggregate.CapturePayment("txn-stripe-12345");
-        Assert.True(captureResult.IsSuccess, $"CapturePayment failed: {captureResult.ErrorMessage}");
-        Assert.Equal("Completed", captureResult.Model!.Root.Status);
+        Assert.True(captureResult.IsSuccess(), $"CapturePayment failed: {captureResult.ErrorMessage()}");
+        Assert.Equal("Completed", captureResult.Model()!.Root.Status);
         participatedContexts.Add("Payment");
 
         // Confirm payment on order
         var confirmPayResult = OrderAggregate.ConfirmPayment(orderModel);
-        Assert.True(confirmPayResult.IsSuccess, $"ConfirmPayment failed: {confirmPayResult.ErrorMessage}");
-        Assert.Equal("Paid", confirmPayResult.Model!.Root.Status);
+        Assert.True(confirmPayResult.IsSuccess(), $"ConfirmPayment failed: {confirmPayResult.ErrorMessage()}");
+        Assert.Equal("Paid", confirmPayResult.Model()!.Root.Status);
 
         // ── 9. Invoice: Generate and send invoice ───────────────────────
         var invModel = new Invoice.Domain.Implementation.AnemicModel();
@@ -222,13 +224,13 @@ public sealed class FullEndToEndJourneyTests
         var genInvResult = invAggregate.GenerateInvoice(
             "INV-000001", orderId, customerId,
             new List<IInvoiceLine> { invoiceLine });
-        Assert.True(genInvResult.IsSuccess, $"GenerateInvoice failed: {genInvResult.ErrorMessage}");
-        Assert.Equal("Generated", genInvResult.Model!.Root.Status);
+        Assert.True(genInvResult.IsSuccess(), $"GenerateInvoice failed: {genInvResult.ErrorMessage()}");
+        Assert.Equal("Generated", genInvResult.Model()!.Root.Status);
 
-        var genInvAggregate = Invoice.Domain.Implementation.Aggregate.CreateInstance(genInvResult.Model);
+        var genInvAggregate = Invoice.Domain.Implementation.Aggregate.CreateInstance(genInvResult.Model());
         var sendInvResult = genInvAggregate.SendInvoice();
-        Assert.True(sendInvResult.IsSuccess, $"SendInvoice failed: {sendInvResult.ErrorMessage}");
-        Assert.Equal("Sent", sendInvResult.Model!.Root.Status);
+        Assert.True(sendInvResult.IsSuccess(), $"SendInvoice failed: {sendInvResult.ErrorMessage()}");
+        Assert.Equal("Sent", sendInvResult.Model()!.Root.Status);
         participatedContexts.Add("Invoice");
 
         // ── 10. Shipment: Create and deliver shipment ───────────────────
@@ -248,9 +250,9 @@ public sealed class FullEndToEndJourneyTests
         participatedContexts.Add("Shipment");
 
         // Confirm delivery on order
-        var deliveryResult = OrderAggregate.ConfirmDelivery(confirmPayResult.Model);
-        Assert.True(deliveryResult.IsSuccess, $"ConfirmDelivery failed: {deliveryResult.ErrorMessage}");
-        Assert.Equal("Delivered", deliveryResult.Model!.Root.Status);
+        var deliveryResult = OrderAggregate.ConfirmDelivery(confirmPayResult.Model());
+        Assert.True(deliveryResult.IsSuccess(), $"ConfirmDelivery failed: {deliveryResult.ErrorMessage()}");
+        Assert.Equal("Delivered", deliveryResult.Model()!.Root.Status);
 
         // ── 11. Review: Submit and approve review ───────────────────────
         var emptyReviewModel = new ReviewAnemicModel();
@@ -260,12 +262,12 @@ public sealed class FullEndToEndJourneyTests
             "The best phone I have ever used. Camera is incredible and the battery lasts all day.",
             isVerifiedPurchase: true,
             reviewExistsCheck: (_, _) => false);
-        Assert.True(submitResult.IsSuccess, $"SubmitReview failed: {submitResult.ErrorMessage}");
+        Assert.True(submitResult.IsSuccess(), $"SubmitReview failed: {submitResult.ErrorMessage()}");
 
-        var submittedReviewAggregate = ReviewAggregate.CreateInstance(submitResult.Model!);
+        var submittedReviewAggregate = ReviewAggregate.CreateInstance(submitResult.Model()!);
         var approveResult = submittedReviewAggregate.ApproveReview();
-        Assert.True(approveResult.IsSuccess, $"ApproveReview failed: {approveResult.ErrorMessage}");
-        Assert.Equal("Published", approveResult.Model!.Root.Status);
+        Assert.True(approveResult.IsSuccess(), $"ApproveReview failed: {approveResult.ErrorMessage()}");
+        Assert.Equal("Published", approveResult.Model()!.Root.Status);
         participatedContexts.Add("Review");
 
         // ── 12. AggregateRating: Calculate aggregate rating ─────────────
@@ -278,14 +280,14 @@ public sealed class FullEndToEndJourneyTests
         };
         var ratingAggregate = AggregateRatingAggregate.CreateInstance(emptyRatingModel);
         var initRatingResult = ratingAggregate.InitializeRating(productId);
-        Assert.True(initRatingResult.IsSuccess, $"InitializeRating failed: {initRatingResult.ErrorMessage}");
+        Assert.True(initRatingResult.IsSuccess(), $"InitializeRating failed: {initRatingResult.ErrorMessage()}");
 
-        var ratingForRecalc = AggregateRatingAggregate.CreateInstance(initRatingResult.Model!);
+        var ratingForRecalc = AggregateRatingAggregate.CreateInstance(initRatingResult.Model()!);
         var recalcResult = ratingForRecalc.RecalculateRating(
             oneStar: 0, twoStar: 0, threeStar: 0, fourStar: 0, fiveStar: 1,
             verifiedReviews: 1, totalVerifiedRatingSum: 5, totalUnverifiedRatingSum: 0);
-        Assert.True(recalcResult.IsSuccess, $"RecalculateRating failed: {recalcResult.ErrorMessage}");
-        Assert.Equal(5.0m, recalcResult.Model!.Root.AverageRating);
+        Assert.True(recalcResult.IsSuccess(), $"RecalculateRating failed: {recalcResult.ErrorMessage()}");
+        Assert.Equal(5.0m, recalcResult.Model()!.Root.AverageRating);
         participatedContexts.Add("AggregateRating");
 
         // ── 13. Campaign: Create a campaign ─────────────────────────────
@@ -294,8 +296,8 @@ public sealed class FullEndToEndJourneyTests
         var createCampResult = campaignAggregate.CreateCampaign(
             "New Phone Launch", "Check out the Galaxy Phone Pro!",
             "tmpl-phone-launch", "seg-phone-enthusiasts");
-        Assert.True(createCampResult.IsSuccess, $"CreateCampaign failed: {createCampResult.ErrorMessage}");
-        Assert.Equal("Draft", createCampResult.Model!.Root.Status);
+        Assert.True(createCampResult.IsSuccess(), $"CreateCampaign failed: {createCampResult.ErrorMessage()}");
+        Assert.Equal("Draft", createCampResult.Model()!.Root.Status);
         participatedContexts.Add("Campaign");
 
         // ── 14. Notification: Create notification ───────────────────────
@@ -303,18 +305,18 @@ public sealed class FullEndToEndJourneyTests
         var notifAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(notifModel);
         var createNotifResult = notifAggregate.CreateNotification(
             customerId, Guid.NewGuid(), "Email", "tmpl-order-delivered", "en-US", "Transactional");
-        Assert.True(createNotifResult.IsSuccess, $"CreateNotification failed: {createNotifResult.ErrorMessage}");
+        Assert.True(createNotifResult.IsSuccess(), $"CreateNotification failed: {createNotifResult.ErrorMessage()}");
 
-        var notifCreatedAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(createNotifResult.Model!);
+        var notifCreatedAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(createNotifResult.Model()!);
         var renderResult = notifCreatedAggregate.Render(
             "<html><body>Your Galaxy Phone Pro has been delivered!</body></html>",
             "Your order has been delivered");
-        Assert.True(renderResult.IsSuccess, $"Render notification failed: {renderResult.ErrorMessage}");
+        Assert.True(renderResult.IsSuccess(), $"Render notification failed: {renderResult.ErrorMessage()}");
 
-        var notifRenderedAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(renderResult.Model!);
+        var notifRenderedAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(renderResult.Model()!);
         var sendNotifResult = notifRenderedAggregate.Send(hasConsent: true);
-        Assert.True(sendNotifResult.IsSuccess, $"Send notification failed: {sendNotifResult.ErrorMessage}");
-        Assert.Equal("Sent", sendNotifResult.Model!.Root.Status);
+        Assert.True(sendNotifResult.IsSuccess(), $"Send notification failed: {sendNotifResult.ErrorMessage()}");
+        Assert.Equal("Sent", sendNotifResult.Model()!.Root.Status);
         participatedContexts.Add("Notification");
 
         // ── Final assertions: All contexts participated ─────────────────
@@ -332,21 +334,21 @@ public sealed class FullEndToEndJourneyTests
         }
 
         // Verify final states across all contexts
-        Assert.Equal("Active", parentCatResult.Model!.Root.Status);      // Category
-        Assert.Equal("Published", publishResult.Model!.Root.Status);     // Product
-        Assert.Equal(1, reserveResult.Model!.Root.Reserved);             // StockItem
-        Assert.Equal("Active", verifyResult.Model!.Root.Status);         // Customer
-        Assert.Equal("Active", sessionResult.Model!.Root.Status);        // Session
-        Assert.Equal("CheckedOut", placeOrderCartResult.Model!.Root.Status); // Cart
-        Assert.Equal("Active", activatePromoResult.Model!.Root.Status);  // Promotion
-        Assert.Equal("Active", genCodeResult.Model!.Root.Status);        // DiscountCode
-        Assert.Equal("Delivered", deliveryResult.Model!.Root.Status);    // Order
-        Assert.Equal("Completed", captureResult.Model!.Root.Status);     // Payment
-        Assert.Equal("Sent", sendInvResult.Model!.Root.Status);          // Invoice
+        Assert.Equal("Active", parentCatResult.Model()!.Root.Status);      // Category
+        Assert.Equal("Published", publishResult.Model()!.Root.Status);     // Product
+        Assert.Equal(1, reserveResult.Model()!.Root.Reserved);             // StockItem
+        Assert.Equal("Active", verifyResult.Model()!.Root.Status);         // Customer
+        Assert.Equal("Active", sessionResult.Model()!.Root.Status);        // Session
+        Assert.Equal("CheckedOut", placeOrderCartResult.Model()!.Root.Status); // Cart
+        Assert.Equal("Active", activatePromoResult.Model()!.Root.Status);  // Promotion
+        Assert.Equal("Active", genCodeResult.Model()!.Root.Status);        // DiscountCode
+        Assert.Equal("Delivered", deliveryResult.Model()!.Root.Status);    // Order
+        Assert.Equal("Completed", captureResult.Model()!.Root.Status);     // Payment
+        Assert.Equal("Sent", sendInvResult.Model()!.Root.Status);          // Invoice
         Assert.Equal("Delivered", shipmentModel.Root.Status);            // Shipment
-        Assert.Equal("Published", approveResult.Model!.Root.Status);     // Review
-        Assert.Equal(5.0m, recalcResult.Model!.Root.AverageRating);      // AggregateRating
-        Assert.Equal("Draft", createCampResult.Model!.Root.Status);      // Campaign
-        Assert.Equal("Sent", sendNotifResult.Model!.Root.Status);        // Notification
+        Assert.Equal("Published", approveResult.Model()!.Root.Status);     // Review
+        Assert.Equal(5.0m, recalcResult.Model()!.Root.AverageRating);      // AggregateRating
+        Assert.Equal("Draft", createCampResult.Model()!.Root.Status);      // Campaign
+        Assert.Equal("Sent", sendNotifResult.Model()!.Root.Status);        // Notification
     }
 }

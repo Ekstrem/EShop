@@ -4,8 +4,11 @@ using Customer.Domain.Implementation;
 using Customer.Domain.Specifications;
 using Customer.DomainServices;
 using Customer.InternalContracts;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 
 namespace Customer.Application.Commands;
@@ -37,8 +40,8 @@ public sealed class RegisterCustomerCommandHandler
             request.LastName,
             request.PasswordHash);
 
-        if (!emailValidator.IsSatisfiedBy(result.Model))
-            throw new InvalidOperationException(emailValidator.ErrorMessage);
+        if (!emailValidator.IsSatisfiedBy(result.Model()))
+            throw new InvalidOperationException(emailValidator.Reason);
 
         await _notifier.HandleAsync(result, ct);
         return result;

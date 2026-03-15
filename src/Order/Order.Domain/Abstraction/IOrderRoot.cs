@@ -1,8 +1,8 @@
 namespace Order.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IOrderRoot : IAggregateRoot<IOrder>
+public interface IOrderRoot : IValueObject
 {
     Guid CustomerId { get; }
     string OrderNumber { get; }

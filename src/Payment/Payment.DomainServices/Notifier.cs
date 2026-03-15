@@ -1,8 +1,12 @@
 namespace Payment.DomainServices;
 
-using Hive.SeedWorks.Events;
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using Payment.Domain;
 using Payment.Domain.Abstraction;
 using Payment.Domain.Implementation;

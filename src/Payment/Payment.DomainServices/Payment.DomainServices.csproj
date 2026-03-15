@@ -6,7 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.1.0" />
-    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../../Shared/EShop.Contracts/EShop.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Payment.Domain/Payment.Domain.csproj" />

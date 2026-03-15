@@ -1,5 +1,8 @@
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 using Session.Domain;
 using Session.Domain.Abstraction;
@@ -43,14 +46,14 @@ public sealed class CreateSessionCommandHandler
         var tempModel = SessionAnemicModel.CreateInstance(Guid.Empty, tempRoot);
 
         if (!loginValidator.IsSatisfiedBy(tempModel))
-            throw new InvalidOperationException(loginValidator.ErrorMessage);
+            throw new InvalidOperationException(loginValidator.Reason);
 
         // Validate max sessions.
         var activeCount = await _queryRepository.GetActiveSessionCountAsync(
             request.CustomerId, ct);
         var maxValidator = MaxSessionsValidator.CreateInstance(activeCount);
         if (!maxValidator.IsSatisfiedBy(tempModel))
-            throw new InvalidOperationException(maxValidator.ErrorMessage);
+            throw new InvalidOperationException(maxValidator.Reason);
 
         var result = SessionAggregate.CreateSession(
             request.CustomerId,

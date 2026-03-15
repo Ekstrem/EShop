@@ -1,16 +1,13 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Specifications;
+
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the customer status is Active.
 /// </summary>
-public sealed class IsActiveValidator : IBusinessOperationValidator<ICustomer, ICustomerAnemicModel>
+public sealed class IsActiveValidator
 {
-    private IsActiveValidator()
-    {
-    }
+    private IsActiveValidator() { }
 
     public static IsActiveValidator CreateInstance()
     {
@@ -22,5 +19,5 @@ public sealed class IsActiveValidator : IBusinessOperationValidator<ICustomer, I
         return model.Root.Status == "Active";
     }
 
-    public string ErrorMessage => "Customer must be in Active status.";
+    public string Reason => "Customer must be in Active status.";
 }

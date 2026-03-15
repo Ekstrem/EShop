@@ -9,5 +9,5 @@ internal sealed class SequentialNumberValidator
     public bool IsSatisfiedBy(string invoiceNumber)
         => !string.IsNullOrWhiteSpace(invoiceNumber) && NumberPattern.IsMatch(invoiceNumber);
 
-    public string ErrorMessage => "Invoice number must follow the sequential format (e.g., INV-000001 or CN-000001).";
+    public string Reason => "Invoice number must follow the sequential format (e.g., INV-000001 or CN-000001).";
 }

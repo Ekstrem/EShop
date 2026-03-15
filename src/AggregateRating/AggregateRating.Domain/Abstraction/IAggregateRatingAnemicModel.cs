@@ -1,10 +1,7 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace AggregateRating.Domain.Abstraction;
 
-/// <summary>
-/// Anemic model contract for the AggregateRating aggregate.
-/// </summary>
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+
 public interface IAggregateRatingAnemicModel : IAnemicModel<IAggregateRating>
 {
     IAggregateRatingRoot Root { get; }

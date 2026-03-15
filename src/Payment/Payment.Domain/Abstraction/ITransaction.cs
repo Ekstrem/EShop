@@ -1,6 +1,6 @@
 namespace Payment.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 public interface ITransaction : IValueObject
 {

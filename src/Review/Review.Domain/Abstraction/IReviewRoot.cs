@@ -1,11 +1,11 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 namespace Review.Domain.Abstraction;
 
 /// <summary>
 /// Aggregate root for the Review bounded context.
 /// </summary>
-public interface IReviewRoot : IAggregateRoot<IReview>
+public interface IReviewRoot : IValueObject
 {
     Guid Id { get; }
     Guid ProductId { get; }

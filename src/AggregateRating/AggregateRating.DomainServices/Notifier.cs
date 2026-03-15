@@ -1,8 +1,12 @@
 namespace AggregateRating.DomainServices;
 
-using Hive.SeedWorks.Events;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using AggregateRating.Domain;
 
 public sealed class Notifier : INotifier<IAggregateRating>

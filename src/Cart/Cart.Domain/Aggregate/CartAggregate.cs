@@ -1,12 +1,30 @@
 namespace Cart.Domain.Aggregate;
 
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Cart.Domain.Abstraction;
 using Cart.Domain.Implementation;
+using EShop.Contracts;
 
 public static class CartAggregate
 {
+    private static AggregateResult<ICart, ICartAnemicModel> Success(
+        ICartAnemicModel oldModel, ICartAnemicModel newModel)
+    {
+        var data = BusinessOperationData<ICart, ICartAnemicModel>
+            .Commit<ICart, ICartAnemicModel>(oldModel, newModel);
+        return new AggregateResultSuccess<ICart, ICartAnemicModel>(data);
+    }
+
+    private static AggregateResult<ICart, ICartAnemicModel> Fail(
+        ICartAnemicModel model, string error)
+    {
+        var data = BusinessOperationData<ICart, ICartAnemicModel>
+            .Commit<ICart, ICartAnemicModel>(model, model);
+        return new AggregateResultException<ICart, ICartAnemicModel>(
+            data, new FailedSpecification<ICart, ICartAnemicModel>(error));
+    }
+
     public static AggregateResult<ICart, ICartAnemicModel> AddItemToCart(
         ICartAnemicModel model,
         Guid variantId,
@@ -39,7 +57,7 @@ public static class CartAggregate
             ShippingAddress = model.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "ItemAddedToCart");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<ICart, ICartAnemicModel> RemoveItemFromCart(
@@ -56,7 +74,7 @@ public static class CartAggregate
             ShippingAddress = model.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "ItemRemovedFromCart");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<ICart, ICartAnemicModel> UpdateCartItemQuantity(
@@ -84,7 +102,7 @@ public static class CartAggregate
             ShippingAddress = model.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "CartItemQuantityUpdated");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<ICart, ICartAnemicModel> ApplyPromoCode(
@@ -103,7 +121,7 @@ public static class CartAggregate
             ShippingAddress = model.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "PromoCodeApplied");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<ICart, ICartAnemicModel> RemovePromoCode(
@@ -117,7 +135,7 @@ public static class CartAggregate
             ShippingAddress = model.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "PromoCodeRemoved");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<ICart, ICartAnemicModel> MergeCarts(
@@ -151,7 +169,7 @@ public static class CartAggregate
             ShippingAddress = target.ShippingAddress ?? source.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "CartsMerged");
+        return Success(target, newModel);
     }
 
     public static AggregateResult<ICart, ICartAnemicModel> PlaceOrder(
@@ -171,6 +189,6 @@ public static class CartAggregate
             ShippingAddress = model.ShippingAddress
         };
 
-        return AggregateResult<ICart, ICartAnemicModel>.Create(newModel, "OrderPlaced");
+        return Success(model, newModel);
     }
 }

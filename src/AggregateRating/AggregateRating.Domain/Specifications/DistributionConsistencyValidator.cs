@@ -1,12 +1,8 @@
-using Hive.SeedWorks.TacticalPatterns;
-using AggregateRating.Domain.Abstraction;
-
 namespace AggregateRating.Domain.Specifications;
 
-/// <summary>
-/// Validates that the sum of the rating distribution equals total reviews.
-/// </summary>
-internal sealed class DistributionConsistencyValidator : IBusinessOperationValidator<IAggregateRatingAnemicModel>
+using AggregateRating.Domain.Abstraction;
+
+internal sealed class DistributionConsistencyValidator
 {
     public bool IsSatisfiedBy(IAggregateRatingAnemicModel model)
     {
@@ -19,5 +15,5 @@ internal sealed class DistributionConsistencyValidator : IBusinessOperationValid
         return distributionSum == model.Root.TotalReviews;
     }
 
-    public string ErrorMessage => "Rating distribution sum must equal total reviews.";
+    public string Reason => "Rating distribution sum must equal total reviews.";
 }

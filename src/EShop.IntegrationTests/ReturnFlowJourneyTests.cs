@@ -1,8 +1,11 @@
 namespace EShop.IntegrationTests;
 
 using Xunit;
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 
 // Shipment
 using Shipment.Domain;
@@ -173,8 +176,8 @@ public class ReturnFlowJourneyTests
 
         var stockAggregate = StockItemImpl.Aggregate.CreateInstance(stockModel);
         var replenishResult = stockAggregate.ReplenishStock(2); // Return 2 items
-        Assert.True(replenishResult.IsSuccess);
-        Assert.Equal(50, replenishResult.Model!.Root.Total); // Back to original
+        Assert.True(replenishResult.IsSuccess());
+        Assert.Equal(50, replenishResult.Model()!.Root.Total); // Back to original
 
         // ---------------------------------------------------------------
         // Step 7: Issue refund on payment
@@ -193,11 +196,11 @@ public class ReturnFlowJourneyTests
 
         var paymentAggregate = PaymentImpl.Aggregate.CreateInstance(paymentModel);
         var refundResult = paymentAggregate.RequestRefund(90.00m); // Refund item cost only
-        Assert.True(refundResult.IsSuccess);
-        Assert.Equal("PartiallyRefunded", refundResult.Model!.Root.Status);
+        Assert.True(refundResult.IsSuccess());
+        Assert.Equal("PartiallyRefunded", refundResult.Model()!.Root.Status);
 
         // Verify refund transaction was added
-        var refundTransactions = refundResult.Model!.Transactions
+        var refundTransactions = refundResult.Model()!.Transactions
             .Where(t => t.Type == "Refund" && t.Status == "Completed")
             .ToList();
         Assert.Single(refundTransactions);
@@ -210,10 +213,10 @@ public class ReturnFlowJourneyTests
         Assert.True(isReceivedValidator.IsSatisfiedBy(receivedReturn));
 
         // Stock was replenished
-        Assert.Equal(50, replenishResult.Model!.Root.Total);
+        Assert.Equal(50, replenishResult.Model()!.Root.Total);
 
         // Partial refund was issued (90 out of 95 - shipping not refunded)
-        Assert.Equal("PartiallyRefunded", refundResult.Model!.Root.Status);
+        Assert.Equal("PartiallyRefunded", refundResult.Model()!.Root.Status);
     }
 
     [Fact]
@@ -234,8 +237,8 @@ public class ReturnFlowJourneyTests
         // Full refund
         var paymentAggregate = PaymentImpl.Aggregate.CreateInstance(paymentModel);
         var refundResult = paymentAggregate.RequestRefund(90.00m);
-        Assert.True(refundResult.IsSuccess);
-        Assert.Equal("FullyRefunded", refundResult.Model!.Root.Status);
+        Assert.True(refundResult.IsSuccess());
+        Assert.Equal("FullyRefunded", refundResult.Model()!.Root.Status);
 
         // Replenish all returned stock
         var stockRoot = StockItemImpl.StockItemRoot.CreateInstance(
@@ -247,12 +250,12 @@ public class ReturnFlowJourneyTests
         };
         var stockAggregate = StockItemImpl.Aggregate.CreateInstance(stockModel);
         var replenishResult = stockAggregate.ReplenishStock(2);
-        Assert.True(replenishResult.IsSuccess);
-        Assert.Equal(20, replenishResult.Model!.Root.Total);
+        Assert.True(replenishResult.IsSuccess());
+        Assert.Equal(20, replenishResult.Model()!.Root.Total);
 
         // Final assertions
-        Assert.Equal("FullyRefunded", refundResult.Model!.Root.Status);
-        Assert.Equal(20, replenishResult.Model!.Root.Total);
+        Assert.Equal("FullyRefunded", refundResult.Model()!.Root.Status);
+        Assert.Equal(20, replenishResult.Model()!.Root.Total);
     }
 
     [Fact]

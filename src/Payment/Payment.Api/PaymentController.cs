@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Payment.Api;
 
 using MediatR;
@@ -23,10 +24,10 @@ public sealed class PaymentController : ControllerBase
         CancellationToken ct)
     {
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{paymentId:guid}/webhook")]
@@ -45,10 +46,10 @@ public sealed class PaymentController : ControllerBase
         };
 
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{paymentId:guid}/void")]
@@ -58,10 +59,10 @@ public sealed class PaymentController : ControllerBase
     {
         var command = new VoidPaymentCommand { PaymentId = paymentId };
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{paymentId:guid}/refund")]
@@ -77,10 +78,10 @@ public sealed class PaymentController : ControllerBase
         };
 
         var result = await _mediator.Send(command, ct);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpGet("{paymentId:guid}/status")]

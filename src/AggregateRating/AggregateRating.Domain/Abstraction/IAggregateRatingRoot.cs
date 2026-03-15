@@ -1,11 +1,8 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace AggregateRating.Domain.Abstraction;
 
-/// <summary>
-/// Aggregate root for the AggregateRating bounded context.
-/// </summary>
-public interface IAggregateRatingRoot : IAggregateRoot<IAggregateRating>
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+
+public interface IAggregateRatingRoot : IValueObject
 {
     Guid Id { get; }
     Guid ProductId { get; }

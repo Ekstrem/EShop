@@ -1,19 +1,33 @@
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
-using AggregateRating.Domain.Abstraction;
-using AggregateRating.Domain.Specifications;
-
 namespace AggregateRating.Domain.Implementation;
 
-/// <summary>
-/// AggregateRating aggregate containing all business operations.
-/// Each method returns an AggregateResult for event-driven processing.
-/// </summary>
-public sealed class AggregateRatingAggregate : Aggregate<IAggregateRating, IAggregateRatingAnemicModel>
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using AggregateRating.Domain.Abstraction;
+using AggregateRating.Domain.Specifications;
+using EShop.Contracts;
+
+internal sealed class AggregateRatingAggregate
 {
-    private AggregateRatingAggregate(IAggregateRatingAnemicModel model) : base(model) { }
+    public IAggregateRatingAnemicModel Model { get; }
+
+    private AggregateRatingAggregate(IAggregateRatingAnemicModel model) => Model = model;
 
     public static AggregateRatingAggregate CreateInstance(IAggregateRatingAnemicModel model) => new(model);
+
+    private AggregateResult<IAggregateRating, IAggregateRatingAnemicModel> Success(IAggregateRatingAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IAggregateRating, IAggregateRatingAnemicModel>
+            .Commit<IAggregateRating, IAggregateRatingAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IAggregateRating, IAggregateRatingAnemicModel>(data);
+    }
+
+    private AggregateResult<IAggregateRating, IAggregateRatingAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IAggregateRating, IAggregateRatingAnemicModel>
+            .Commit<IAggregateRating, IAggregateRatingAnemicModel>(Model, Model);
+        return new AggregateResultException<IAggregateRating, IAggregateRatingAnemicModel>(
+            data, new FailedSpecification<IAggregateRating, IAggregateRatingAnemicModel>(error));
+    }
 
     /// <summary>
     /// Initializes a new aggregate rating for a product (triggered by ProductPublished event).
@@ -31,13 +45,11 @@ public sealed class AggregateRatingAggregate : Aggregate<IAggregateRating, IAggr
             WeightedAverage = 0m
         };
 
-        return AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     /// <summary>
     /// Recalculates the aggregate rating based on current review data.
-    /// Updates average, distribution, weighted average, and status.
-    /// Verified purchases carry double weight in the weighted average.
     /// </summary>
     public AggregateResult<IAggregateRating, IAggregateRatingAnemicModel> RecalculateRating(
         int oneStar,
@@ -93,18 +105,18 @@ public sealed class AggregateRatingAggregate : Aggregate<IAggregateRating, IAggr
         // Validate average range
         var averageValidator = new AverageRangeValidator();
         if (totalReviews > 0 && !averageValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>.Fail(averageValidator.ErrorMessage);
+            return Fail(averageValidator.Reason);
 
         // Validate distribution consistency
         var distributionValidator = new DistributionConsistencyValidator();
         if (!distributionValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>.Fail(distributionValidator.ErrorMessage);
+            return Fail(distributionValidator.Reason);
 
         // Validate publication threshold
         var thresholdValidator = new PublicationThresholdValidator();
         if (!thresholdValidator.IsSatisfiedBy(anemic) && status == "Active")
-            return AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>.Fail(thresholdValidator.ErrorMessage);
+            return Fail(thresholdValidator.Reason);
 
-        return AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

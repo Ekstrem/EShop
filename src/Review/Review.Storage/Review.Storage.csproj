@@ -8,7 +8,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../../Shared/EShop.Contracts/EShop.Contracts.csproj" />
     <ProjectReference Include="../Review.Domain/Review.Domain.csproj" />
     <ProjectReference Include="../Review.InternalContracts/Review.InternalContracts.csproj" />
   </ItemGroup>

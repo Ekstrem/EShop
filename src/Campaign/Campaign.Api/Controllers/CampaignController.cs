@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Campaign.Api.Controllers;
 
 using MediatR;
@@ -22,7 +23,7 @@ public sealed class CampaignController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}")]
@@ -33,7 +34,7 @@ public sealed class CampaignController : ControllerBase
     {
         var command = new UpdateCampaignCommand(id, request.Name, request.Subject, request.TemplateId, request.SegmentId);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/schedule")]
@@ -44,7 +45,7 @@ public sealed class CampaignController : ControllerBase
     {
         var command = new ScheduleCampaignCommand(id, request.ScheduledAt);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/cancel")]
@@ -52,7 +53,7 @@ public sealed class CampaignController : ControllerBase
     {
         var command = new CancelCampaignCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/start-sending")]
@@ -63,7 +64,7 @@ public sealed class CampaignController : ControllerBase
     {
         var command = new StartSendingCommand(id, request.TotalRecipients);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/complete-sending")]
@@ -74,7 +75,7 @@ public sealed class CampaignController : ControllerBase
     {
         var command = new CompleteSendingCommand(id, request.SentCount, request.FailedCount);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("{id:guid}")]

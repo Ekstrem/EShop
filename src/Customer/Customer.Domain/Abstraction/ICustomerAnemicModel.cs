@@ -1,6 +1,6 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Abstraction;
+
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 /// <summary>
 /// Anemic model contract for the Customer aggregate.

@@ -1,5 +1,8 @@
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 using Session.Domain;
 using Session.Domain.Abstraction;
@@ -30,11 +33,11 @@ public sealed class RefreshSessionCommandHandler
 
         var activeValidator = IsActiveSessionValidator.CreateInstance();
         if (!activeValidator.IsSatisfiedBy(current))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         var expiredValidator = SessionNotExpiredValidator.CreateInstance();
         if (!expiredValidator.IsSatisfiedBy(current))
-            throw new InvalidOperationException(expiredValidator.ErrorMessage);
+            throw new InvalidOperationException(expiredValidator.Reason);
 
         var result = SessionAggregate.RefreshSession(
             current, request.NewToken, TimeSpan.FromMinutes(request.DurationMinutes));

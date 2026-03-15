@@ -1,8 +1,9 @@
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
-using Session.Domain.Abstraction;
-
 namespace Session.Domain.Implementation;
+
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using Session.Domain.Abstraction;
+using EShop.Contracts;
 
 /// <summary>
 /// Session aggregate containing all business operations.
@@ -10,8 +11,23 @@ namespace Session.Domain.Implementation;
 /// </summary>
 public sealed class SessionAggregate
 {
-    private SessionAggregate()
+    private SessionAggregate() { }
+
+    private static AggregateResult<ISession, ISessionAnemicModel> Success(
+        ISessionAnemicModel oldModel, ISessionAnemicModel newModel)
     {
+        var data = BusinessOperationData<ISession, ISessionAnemicModel>
+            .Commit<ISession, ISessionAnemicModel>(oldModel, newModel);
+        return new AggregateResultSuccess<ISession, ISessionAnemicModel>(data);
+    }
+
+    private static AggregateResult<ISession, ISessionAnemicModel> Fail(
+        ISessionAnemicModel model, string error)
+    {
+        var data = BusinessOperationData<ISession, ISessionAnemicModel>
+            .Commit<ISession, ISessionAnemicModel>(model, model);
+        return new AggregateResultException<ISession, ISessionAnemicModel>(
+            data, new FailedSpecification<ISession, ISessionAnemicModel>(error));
     }
 
     /// <summary>
@@ -29,8 +45,10 @@ public sealed class SessionAggregate
             id, customerId, token, now.Add(duration), "Active", now, deviceInfo);
         var model = SessionAnemicModel.CreateInstance(id, root);
 
-        return AggregateResult<ISession, ISessionAnemicModel>
-            .Create(model, nameof(CreateSession));
+        var emptyRoot = SessionRoot.CreateInstance(
+            Guid.Empty, Guid.Empty, string.Empty, DateTime.MinValue, string.Empty, DateTime.MinValue, string.Empty);
+        var empty = SessionAnemicModel.CreateInstance(Guid.Empty, emptyRoot);
+        return Success(empty, model);
     }
 
     /// <summary>
@@ -51,8 +69,7 @@ public sealed class SessionAggregate
             current.Root.DeviceInfo);
         var model = SessionAnemicModel.CreateInstance(current.Id, root);
 
-        return AggregateResult<ISession, ISessionAnemicModel>
-            .Create(model, nameof(RefreshSession));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -71,8 +88,7 @@ public sealed class SessionAggregate
             current.Root.DeviceInfo);
         var model = SessionAnemicModel.CreateInstance(current.Id, root);
 
-        return AggregateResult<ISession, ISessionAnemicModel>
-            .Create(model, nameof(RevokeSession));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -94,8 +110,7 @@ public sealed class SessionAggregate
                     session.Root.CreatedAt,
                     session.Root.DeviceInfo);
                 var model = SessionAnemicModel.CreateInstance(session.Id, root);
-                return AggregateResult<ISession, ISessionAnemicModel>
-                    .Create(model, nameof(RevokeAllSessions));
+                return Success(session, model);
             })
             .ToList()
             .AsReadOnly();

@@ -1,15 +1,33 @@
 namespace Campaign.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Campaign.Domain.Abstraction;
 using Campaign.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(ICampaignAnemicModel model) : base(model) { }
+    public ICampaignAnemicModel Model { get; }
+
+    private Aggregate(ICampaignAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(ICampaignAnemicModel model) => new(model);
+
+    private AggregateResult<ICampaign, ICampaignAnemicModel> Success(ICampaignAnemicModel newModel)
+    {
+        var data = BusinessOperationData<ICampaign, ICampaignAnemicModel>
+            .Commit<ICampaign, ICampaignAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<ICampaign, ICampaignAnemicModel>(data);
+    }
+
+    private AggregateResult<ICampaign, ICampaignAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<ICampaign, ICampaignAnemicModel>
+            .Commit<ICampaign, ICampaignAnemicModel>(Model, Model);
+        return new AggregateResultException<ICampaign, ICampaignAnemicModel>(
+            data, new FailedSpecification<ICampaign, ICampaignAnemicModel>(error));
+    }
 
     public AggregateResult<ICampaign, ICampaignAnemicModel> CreateCampaign(
         string name,
@@ -26,7 +44,7 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
             FailedCount = 0
         };
 
-        return AggregateResult<ICampaign, ICampaignAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICampaign, ICampaignAnemicModel> UpdateCampaign(
@@ -37,8 +55,7 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
     {
         var validator = new IsDraftValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Only draft campaigns can be updated.");
+            return Fail("Only draft campaigns can be updated.");
 
         var root = CampaignRoot.CreateInstance(
             name, subject, templateId, segmentId,
@@ -52,25 +69,22 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
             FailedCount = Model.FailedCount
         };
 
-        return AggregateResult<ICampaign, ICampaignAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICampaign, ICampaignAnemicModel> ScheduleCampaign(DateTime scheduledAt)
     {
         var draftValidator = new IsDraftValidator();
         if (!draftValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Only draft campaigns can be scheduled.");
+            return Fail("Only draft campaigns can be scheduled.");
 
         var requiredFields = new HasRequiredFieldsValidator();
         if (!requiredFields.IsSatisfiedBy(Model))
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Campaign must have templateId, subject, and segmentId.");
+            return Fail("Campaign must have templateId, subject, and segmentId.");
 
         var scheduleValidator = new ScheduleInFutureValidator(scheduledAt);
         if (!scheduleValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Scheduled date must be in the future.");
+            return Fail("Scheduled date must be in the future.");
 
         var root = CampaignRoot.CreateInstance(
             Model.Root.Name, Model.Root.Subject, Model.Root.TemplateId,
@@ -84,15 +98,14 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
             FailedCount = Model.FailedCount
         };
 
-        return AggregateResult<ICampaign, ICampaignAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICampaign, ICampaignAnemicModel> CancelCampaign()
     {
         var validator = new CanCancelValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Only Draft or Scheduled campaigns can be cancelled.");
+            return Fail("Only Draft or Scheduled campaigns can be cancelled.");
 
         var root = CampaignRoot.CreateInstance(
             Model.Root.Name, Model.Root.Subject, Model.Root.TemplateId,
@@ -106,15 +119,14 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
             FailedCount = Model.FailedCount
         };
 
-        return AggregateResult<ICampaign, ICampaignAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICampaign, ICampaignAnemicModel> StartSending(int totalRecipients)
     {
         var validator = new IsScheduledValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Only scheduled campaigns can start sending.");
+            return Fail("Only scheduled campaigns can start sending.");
 
         var root = CampaignRoot.CreateInstance(
             Model.Root.Name, Model.Root.Subject, Model.Root.TemplateId,
@@ -128,14 +140,13 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
             FailedCount = 0
         };
 
-        return AggregateResult<ICampaign, ICampaignAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICampaign, ICampaignAnemicModel> CompleteSending(int sentCount, int failedCount)
     {
         if (Model.Root.Status != "Sending")
-            return AggregateResult<ICampaign, ICampaignAnemicModel>.Fail(
-                "Only campaigns in Sending status can be completed.");
+            return Fail("Only campaigns in Sending status can be completed.");
 
         var root = CampaignRoot.CreateInstance(
             Model.Root.Name, Model.Root.Subject, Model.Root.TemplateId,
@@ -149,6 +160,6 @@ internal sealed class Aggregate : Aggregate<ICampaign, ICampaignAnemicModel>
             FailedCount = failedCount
         };
 
-        return AggregateResult<ICampaign, ICampaignAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using Xunit;
 using Promotion.Domain.Abstraction;
 using Promotion.Domain.Implementation;
@@ -37,15 +38,15 @@ public sealed class MarketingCampaignJourneyTests
             conditions: "Electronics category only",
             allowStacking: false);
 
-        Assert.True(createPromoResult.IsSuccess, $"CreatePromotion failed: {createPromoResult.ErrorMessage}");
-        Assert.Equal("Draft", createPromoResult.Model!.Root.Status);
+        Assert.True(createPromoResult.IsSuccess(), $"CreatePromotion failed: {createPromoResult.ErrorMessage()}");
+        Assert.Equal("Draft", createPromoResult.Model()!.Root.Status);
 
         // ── Step 2: Activate the promotion ──────────────────────────────
-        var draftPromoAggregate = Promotion.Domain.Implementation.Aggregate.CreateInstance(createPromoResult.Model);
+        var draftPromoAggregate = Promotion.Domain.Implementation.Aggregate.CreateInstance(createPromoResult.Model());
         var activateResult = draftPromoAggregate.ActivatePromotion();
 
-        Assert.True(activateResult.IsSuccess, $"ActivatePromotion failed: {activateResult.ErrorMessage}");
-        Assert.Equal("Active", activateResult.Model!.Root.Status);
+        Assert.True(activateResult.IsSuccess(), $"ActivatePromotion failed: {activateResult.ErrorMessage()}");
+        Assert.Equal("Active", activateResult.Model()!.Root.Status);
 
         // ── Step 3: Generate a discount code linked to the promotion ────
         var emptyCodeModel = new DiscountCode.Domain.Implementation.AnemicModel();
@@ -57,9 +58,9 @@ public sealed class MarketingCampaignJourneyTests
             maxUsage: 100,
             expiresAt: DateTime.UtcNow.AddDays(30));
 
-        Assert.True(generateCodeResult.IsSuccess, $"GenerateDiscountCode failed: {generateCodeResult.ErrorMessage}");
-        Assert.Equal("Active", generateCodeResult.Model!.Root.Status);
-        Assert.Equal("SUMMER2026", generateCodeResult.Model.Root.Code);
+        Assert.True(generateCodeResult.IsSuccess(), $"GenerateDiscountCode failed: {generateCodeResult.ErrorMessage()}");
+        Assert.Equal("Active", generateCodeResult.Model()!.Root.Status);
+        Assert.Equal("SUMMER2026", generateCodeResult.Model().Root.Code);
 
         // ── Step 4: Create a marketing campaign (Draft) ─────────────────
         var emptyCampaignModel = new Campaign.Domain.Implementation.AnemicModel();
@@ -71,30 +72,30 @@ public sealed class MarketingCampaignJourneyTests
             templateId: "tmpl-summer-sale",
             segmentId: "seg-electronics-buyers");
 
-        Assert.True(createCampaignResult.IsSuccess, $"CreateCampaign failed: {createCampaignResult.ErrorMessage}");
-        Assert.Equal("Draft", createCampaignResult.Model!.Root.Status);
+        Assert.True(createCampaignResult.IsSuccess(), $"CreateCampaign failed: {createCampaignResult.ErrorMessage()}");
+        Assert.Equal("Draft", createCampaignResult.Model()!.Root.Status);
 
         // ── Step 5: Schedule the campaign ────────────────────────────────
-        var draftCampaignAggregate = Campaign.Domain.Implementation.Aggregate.CreateInstance(createCampaignResult.Model);
+        var draftCampaignAggregate = Campaign.Domain.Implementation.Aggregate.CreateInstance(createCampaignResult.Model());
         var scheduleResult = draftCampaignAggregate.ScheduleCampaign(DateTime.UtcNow.AddDays(1));
 
-        Assert.True(scheduleResult.IsSuccess, $"ScheduleCampaign failed: {scheduleResult.ErrorMessage}");
-        Assert.Equal("Scheduled", scheduleResult.Model!.Root.Status);
+        Assert.True(scheduleResult.IsSuccess(), $"ScheduleCampaign failed: {scheduleResult.ErrorMessage()}");
+        Assert.Equal("Scheduled", scheduleResult.Model()!.Root.Status);
 
         // ── Step 6: Start sending the campaign ──────────────────────────
-        var scheduledCampaignAggregate = Campaign.Domain.Implementation.Aggregate.CreateInstance(scheduleResult.Model);
+        var scheduledCampaignAggregate = Campaign.Domain.Implementation.Aggregate.CreateInstance(scheduleResult.Model());
         var startSendResult = scheduledCampaignAggregate.StartSending(totalRecipients: 500);
 
-        Assert.True(startSendResult.IsSuccess, $"StartSending failed: {startSendResult.ErrorMessage}");
-        Assert.Equal("Sending", startSendResult.Model!.Root.Status);
-        Assert.Equal(500, startSendResult.Model.TotalRecipients);
+        Assert.True(startSendResult.IsSuccess(), $"StartSending failed: {startSendResult.ErrorMessage()}");
+        Assert.Equal("Sending", startSendResult.Model()!.Root.Status);
+        Assert.Equal(500, startSendResult.Model().TotalRecipients);
 
         // Complete sending
-        var sendingAggregate = Campaign.Domain.Implementation.Aggregate.CreateInstance(startSendResult.Model);
+        var sendingAggregate = Campaign.Domain.Implementation.Aggregate.CreateInstance(startSendResult.Model());
         var completeSendResult = sendingAggregate.CompleteSending(sentCount: 495, failedCount: 5);
 
-        Assert.True(completeSendResult.IsSuccess, $"CompleteSending failed: {completeSendResult.ErrorMessage}");
-        Assert.Equal("Completed", completeSendResult.Model!.Root.Status);
+        Assert.True(completeSendResult.IsSuccess(), $"CompleteSending failed: {completeSendResult.ErrorMessage()}");
+        Assert.Equal("Completed", completeSendResult.Model()!.Root.Status);
 
         // ── Step 7: Create a notification for the campaign ──────────────
         var emptyNotifModel = new Notification.Domain.Implementation.AnemicModel();
@@ -108,29 +109,29 @@ public sealed class MarketingCampaignJourneyTests
             locale: "en-US",
             type: "Marketing");
 
-        Assert.True(createNotifResult.IsSuccess, $"CreateNotification failed: {createNotifResult.ErrorMessage}");
-        Assert.Equal("Created", createNotifResult.Model!.Root.Status);
+        Assert.True(createNotifResult.IsSuccess(), $"CreateNotification failed: {createNotifResult.ErrorMessage()}");
+        Assert.Equal("Created", createNotifResult.Model()!.Root.Status);
 
         // ── Step 8: Render the notification ─────────────────────────────
-        var createdNotifAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(createNotifResult.Model);
+        var createdNotifAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(createNotifResult.Model());
         var renderResult = createdNotifAggregate.Render(
             renderedContent: "<html><body>Save 20% on Electronics with code SUMMER2026!</body></html>",
             subject: "Save 20% on Electronics!");
 
-        Assert.True(renderResult.IsSuccess, $"Render failed: {renderResult.ErrorMessage}");
-        Assert.Equal("Rendered", renderResult.Model!.Root.Status);
+        Assert.True(renderResult.IsSuccess(), $"Render failed: {renderResult.ErrorMessage()}");
+        Assert.Equal("Rendered", renderResult.Model()!.Root.Status);
 
         // ── Step 9: Send the notification (with consent=true) ───────────
-        var renderedNotifAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(renderResult.Model);
+        var renderedNotifAggregate = Notification.Domain.Implementation.Aggregate.CreateInstance(renderResult.Model());
         var sendResult = renderedNotifAggregate.Send(hasConsent: true);
 
-        Assert.True(sendResult.IsSuccess, $"Send failed: {sendResult.ErrorMessage}");
-        Assert.Equal("Sent", sendResult.Model!.Root.Status);
+        Assert.True(sendResult.IsSuccess(), $"Send failed: {sendResult.ErrorMessage()}");
+        Assert.Equal("Sent", sendResult.Model()!.Root.Status);
 
         // ── Final assertions ────────────────────────────────────────────
-        Assert.Equal("Active", activateResult.Model.Root.Status);
-        Assert.Equal("Active", generateCodeResult.Model.Root.Status);
-        Assert.Equal("Completed", completeSendResult.Model.Root.Status);
-        Assert.Equal("Sent", sendResult.Model.Root.Status);
+        Assert.Equal("Active", activateResult.Model().Root.Status);
+        Assert.Equal("Active", generateCodeResult.Model().Root.Status);
+        Assert.Equal("Completed", completeSendResult.Model().Root.Status);
+        Assert.Equal("Sent", sendResult.Model().Root.Status);
     }
 }

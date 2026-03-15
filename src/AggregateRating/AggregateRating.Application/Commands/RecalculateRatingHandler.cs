@@ -1,21 +1,24 @@
 namespace AggregateRating.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using EShop.Contracts;
 using AggregateRating.Domain;
 using AggregateRating.Domain.Abstraction;
 using AggregateRating.Domain.Implementation;
+using AggregateRating.DomainServices;
 using AggregateRating.InternalContracts;
 
 public sealed class RecalculateRatingHandler
     : IRequestHandler<RecalculateRatingCommand, AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>>
 {
-    private readonly IAggregateProvider<IAggregateRating, IAggregateRatingAnemicModel> _provider;
+    private readonly AggregateProvider _provider;
     private readonly IAggregateRatingQueryRepository _queryRepository;
 
     public RecalculateRatingHandler(
-        IAggregateProvider<IAggregateRating, IAggregateRatingAnemicModel> provider,
+        AggregateProvider provider,
         IAggregateRatingQueryRepository queryRepository)
     {
         _provider = provider;
@@ -28,8 +31,8 @@ public sealed class RecalculateRatingHandler
     {
         var existing = await _queryRepository.GetByProductIdAsync(request.ProductId, cancellationToken);
         if (existing is null)
-            return AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>
-                .Fail("Aggregate rating not found for this product.");
+            return AggregateResultExtensions.FailResult<IAggregateRating, IAggregateRatingAnemicModel>(
+                "Aggregate rating not found for this product.");
 
         var root = AggregateRatingRoot.CreateInstance(
             existing.Id,

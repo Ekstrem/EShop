@@ -1,9 +1,8 @@
 namespace Promotion.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Promotion.Domain.Abstraction;
 
-internal sealed class DiscountValueValidator : IBusinessOperationValidator<IPromotionAnemicModel>
+internal sealed class DiscountValueValidator
 {
     public bool IsSatisfiedBy(IPromotionAnemicModel model)
     {
@@ -16,5 +15,5 @@ internal sealed class DiscountValueValidator : IBusinessOperationValidator<IProm
         return true;
     }
 
-    public string ErrorMessage => "Discount value must be greater than 0 and percentage must not exceed 100.";
+    public string Reason => "Discount value must be greater than 0 and percentage must not exceed 100.";
 }

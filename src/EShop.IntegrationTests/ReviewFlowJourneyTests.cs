@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using Xunit;
 using Review.Domain.Abstraction;
 using Review.Domain.Implementation;
@@ -63,17 +64,17 @@ public sealed class ReviewFlowJourneyTests
             isVerifiedPurchase: true,
             reviewExistsCheck: (_, _) => false);
 
-        Assert.True(submitResult.IsSuccess, $"SubmitReview failed: {submitResult.ErrorMessage}");
-        Assert.Equal("Submitted", submitResult.Model!.Root.Status);
-        Assert.Equal(5, submitResult.Model.Root.Rating);
-        Assert.True(submitResult.Model.Root.IsVerifiedPurchase);
+        Assert.True(submitResult.IsSuccess(), $"SubmitReview failed: {submitResult.ErrorMessage()}");
+        Assert.Equal("Submitted", submitResult.Model()!.Root.Status);
+        Assert.Equal(5, submitResult.Model().Root.Rating);
+        Assert.True(submitResult.Model().Root.IsVerifiedPurchase);
 
         // ── Step 3: Approve the review (moderation) ─────────────────────
-        var submittedAggregate = ReviewAggregate.CreateInstance(submitResult.Model);
+        var submittedAggregate = ReviewAggregate.CreateInstance(submitResult.Model());
         var approveResult = submittedAggregate.ApproveReview();
 
-        Assert.True(approveResult.IsSuccess, $"ApproveReview failed: {approveResult.ErrorMessage}");
-        Assert.Equal("Published", approveResult.Model!.Root.Status);
+        Assert.True(approveResult.IsSuccess(), $"ApproveReview failed: {approveResult.ErrorMessage()}");
+        Assert.Equal("Published", approveResult.Model()!.Root.Status);
 
         // ── Step 4: Initialize aggregate rating for the product ─────────
         var emptyRatingModel = new AggregateRatingAnemicModel
@@ -87,13 +88,13 @@ public sealed class ReviewFlowJourneyTests
         var ratingAggregate = AggregateRatingAggregate.CreateInstance(emptyRatingModel);
         var initResult = ratingAggregate.InitializeRating(productId);
 
-        Assert.True(initResult.IsSuccess, $"InitializeRating failed: {initResult.ErrorMessage}");
-        Assert.Equal("Pending", initResult.Model!.Root.Status);
-        Assert.Equal(0, initResult.Model.Root.TotalReviews);
+        Assert.True(initResult.IsSuccess(), $"InitializeRating failed: {initResult.ErrorMessage()}");
+        Assert.Equal("Pending", initResult.Model()!.Root.Status);
+        Assert.Equal(0, initResult.Model().Root.TotalReviews);
 
         // ── Step 5: Recalculate rating with the review data ─────────────
         // One 5-star verified review
-        var ratingAggregateForRecalc = AggregateRatingAggregate.CreateInstance(initResult.Model);
+        var ratingAggregateForRecalc = AggregateRatingAggregate.CreateInstance(initResult.Model());
         var recalcResult = ratingAggregateForRecalc.RecalculateRating(
             oneStar: 0,
             twoStar: 0,
@@ -104,14 +105,14 @@ public sealed class ReviewFlowJourneyTests
             totalVerifiedRatingSum: 5,
             totalUnverifiedRatingSum: 0);
 
-        Assert.True(recalcResult.IsSuccess, $"RecalculateRating failed: {recalcResult.ErrorMessage}");
+        Assert.True(recalcResult.IsSuccess(), $"RecalculateRating failed: {recalcResult.ErrorMessage()}");
 
         // ── Final assertions ────────────────────────────────────────────
         // Review is Published
-        Assert.Equal("Published", approveResult.Model.Root.Status);
+        Assert.Equal("Published", approveResult.Model().Root.Status);
 
         // AggregateRating has correct values
-        var finalRating = recalcResult.Model!;
+        var finalRating = recalcResult.Model()!;
         Assert.Equal(5.0m, finalRating.Root.AverageRating);
         Assert.Equal(1, finalRating.Root.TotalReviews);
         Assert.Equal(1, finalRating.Root.VerifiedReviews);

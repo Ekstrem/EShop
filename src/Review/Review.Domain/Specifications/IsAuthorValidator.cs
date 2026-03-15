@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Review.Domain.Abstraction;
 
 namespace Review.Domain.Specifications;
@@ -6,7 +5,7 @@ namespace Review.Domain.Specifications;
 /// <summary>
 /// Validates that the requester is the author of the review.
 /// </summary>
-internal sealed class IsAuthorValidator : IBusinessOperationValidator<IReviewAnemicModel>
+internal sealed class IsAuthorValidator
 {
     private readonly Guid _requesterId;
 
@@ -23,5 +22,5 @@ internal sealed class IsAuthorValidator : IBusinessOperationValidator<IReviewAne
     public bool IsSatisfiedBy(IReviewAnemicModel model)
         => model.Root.CustomerId == _requesterId;
 
-    public string ErrorMessage => "Only the author can perform this operation.";
+    public string Reason => "Only the author can perform this operation.";
 }

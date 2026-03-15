@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace StockItem.Api;
 
 using MediatR;
@@ -24,10 +25,10 @@ public sealed class StockItemController : ControllerBase
     {
         var command = new ReserveStockCommand(id, request.OrderId, request.Quantity);
         var result = await _mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/release")]
@@ -38,10 +39,10 @@ public sealed class StockItemController : ControllerBase
     {
         var command = new ReleaseStockCommand(id, request.OrderId);
         var result = await _mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/replenish")]
@@ -52,10 +53,10 @@ public sealed class StockItemController : ControllerBase
     {
         var command = new ReplenishStockCommand(id, request.Quantity);
         var result = await _mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/adjust")]
@@ -66,10 +67,10 @@ public sealed class StockItemController : ControllerBase
     {
         var command = new AdjustStockCommand(id, request.NewTotal);
         var result = await _mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpGet("{id:guid}")]

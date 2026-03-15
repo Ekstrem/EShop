@@ -1,12 +1,11 @@
 namespace Invoice.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Invoice.Domain.Abstraction;
 
-internal sealed class IsGeneratedValidator : IBusinessOperationValidator<IInvoiceAnemicModel>
+internal sealed class IsGeneratedValidator
 {
     public bool IsSatisfiedBy(IInvoiceAnemicModel model)
         => model.Root.Status == "Generated";
 
-    public string ErrorMessage => "Invoice must be in Generated status.";
+    public string Reason => "Invoice must be in Generated status.";
 }

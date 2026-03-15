@@ -1,8 +1,8 @@
 namespace Invoice.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IInvoiceRoot : IAggregateRoot<IInvoice>
+public interface IInvoiceRoot : IValueObject
 {
     string InvoiceNumber { get; }
     Guid OrderId { get; }

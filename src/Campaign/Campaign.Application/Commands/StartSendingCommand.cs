@@ -1,7 +1,8 @@
 namespace Campaign.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using Campaign.Domain;
 using Campaign.Domain.Abstraction;
 

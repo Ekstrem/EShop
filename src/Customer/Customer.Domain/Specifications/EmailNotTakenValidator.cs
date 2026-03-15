@@ -1,12 +1,11 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Specifications;
+
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the email address is not already taken by another customer.
 /// </summary>
-public sealed class EmailNotTakenValidator : IBusinessOperationValidator<ICustomer, ICustomerAnemicModel>
+public sealed class EmailNotTakenValidator
 {
     private readonly Func<string, bool> _emailExistsCheck;
 
@@ -25,5 +24,5 @@ public sealed class EmailNotTakenValidator : IBusinessOperationValidator<ICustom
         return !_emailExistsCheck(model.Root.Email);
     }
 
-    public string ErrorMessage => "The email address is already registered.";
+    public string Reason => "The email address is already registered.";
 }

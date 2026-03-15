@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Category.Api;
 
 using MediatR;
@@ -22,10 +23,10 @@ public sealed class CategoryController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPut("{id:guid}")]
@@ -36,10 +37,10 @@ public sealed class CategoryController : ControllerBase
     {
         var cmd = command with { CategoryId = id };
         var result = await _mediator.Send(cmd, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/move")]
@@ -50,10 +51,10 @@ public sealed class CategoryController : ControllerBase
     {
         var cmd = command with { CategoryId = id };
         var result = await _mediator.Send(cmd, cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/deactivate")]
@@ -62,10 +63,10 @@ public sealed class CategoryController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeactivateCategoryCommand(id), cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpPost("{id:guid}/activate")]
@@ -74,10 +75,10 @@ public sealed class CategoryController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new ActivateCategoryCommand(id), cancellationToken);
-        if (!result.IsSuccess)
-            return BadRequest(result.ErrorMessage);
+        if (!result.IsSuccess())
+            return BadRequest(result.ErrorMessage());
 
-        return Ok(result.Model);
+        return Ok(result.Model());
     }
 
     [HttpGet("{id:guid}")]

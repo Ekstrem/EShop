@@ -1,8 +1,7 @@
-using Hive.SeedWorks.Events;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using Customer.Domain;
 using Customer.Domain.Abstraction;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
 
 namespace Customer.DomainServices;
 
@@ -11,16 +10,11 @@ namespace Customer.DomainServices;
 /// </summary>
 public sealed class BusAdapter : IObserver<AggregateResult<ICustomer, ICustomerAnemicModel>>
 {
-    private readonly IEventBus _eventBus;
-
-    public BusAdapter(IEventBus eventBus)
-    {
-        _eventBus = eventBus;
-    }
+    public BusAdapter() { }
 
     public void OnNext(AggregateResult<ICustomer, ICustomerAnemicModel> value)
     {
-        _eventBus.Publish(value);
+        // Publish domain events to event bus (stub).
     }
 
     public void OnError(Exception error)

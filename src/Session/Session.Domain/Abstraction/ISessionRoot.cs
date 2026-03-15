@@ -1,11 +1,11 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Session.Domain.Abstraction;
+
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 /// <summary>
 /// Aggregate root for the Session bounded context.
 /// </summary>
-public interface ISessionRoot : IAggregateRoot<ISession>
+public interface ISessionRoot : IValueObject
 {
     Guid Id { get; }
     Guid CustomerId { get; }

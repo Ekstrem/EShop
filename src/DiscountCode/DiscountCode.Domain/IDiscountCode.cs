@@ -1,11 +1,5 @@
 namespace DiscountCode.Domain;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
 
 public interface IDiscountCode : IBoundedContext { }
-
-public class DiscountCodeBoundedContextDescription : IBoundedContextDescription
-{
-    public string ContextName => "DiscountCode";
-    public int MicroserviceVersion => 1;
-}

@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Shipment.Domain.Abstraction;
 
 namespace Shipment.Domain.Specifications;
@@ -7,7 +6,7 @@ namespace Shipment.Domain.Specifications;
 /// Validates that shipment status transitions follow the correct sequence:
 /// Pending -> Packed -> Shipped -> InTransit -> Delivered.
 /// </summary>
-public sealed class SequentialStatusValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
+internal sealed class SequentialStatusValidator
 {
     private static readonly List<string> StatusOrder = new()
     {
@@ -36,6 +35,6 @@ public sealed class SequentialStatusValidator : IBusinessOperationValidator<IShi
         return targetIndex > currentIndex;
     }
 
-    public string ErrorMessage =>
+    public string Reason =>
         $"Cannot transition to '{_targetStatus}' from current status. Status transitions must be sequential.";
 }

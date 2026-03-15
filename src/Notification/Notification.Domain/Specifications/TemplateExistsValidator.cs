@@ -1,12 +1,11 @@
 namespace Notification.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Notification.Domain.Abstraction;
 
-internal sealed class TemplateExistsValidator : IBusinessOperationValidator<INotificationAnemicModel>
+internal sealed class TemplateExistsValidator
 {
     public bool IsSatisfiedBy(INotificationAnemicModel model)
         => !string.IsNullOrWhiteSpace(model.Root.TemplateId);
 
-    public string ErrorMessage => "Template does not exist.";
+    public string Reason => "Template does not exist.";
 }

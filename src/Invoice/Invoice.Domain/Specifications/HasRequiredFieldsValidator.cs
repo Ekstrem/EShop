@@ -24,5 +24,5 @@ internal sealed class HasRequiredFieldsValidator
         return true;
     }
 
-    public string ErrorMessage => "Invoice must have a number, date, customer, at least one line, and valid VAT rates.";
+    public string Reason => "Invoice must have a number, date, customer, at least one line, and valid VAT rates.";
 }

@@ -1,12 +1,11 @@
 namespace DiscountCode.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using DiscountCode.Domain.Abstraction;
 
-internal sealed class CodeUniqueValidator : IBusinessOperationValidator<IDiscountCodeAnemicModel>
+internal sealed class CodeUniqueValidator
 {
     public bool IsSatisfiedBy(IDiscountCodeAnemicModel model)
         => !string.IsNullOrWhiteSpace(model.Root.Code);
 
-    public string ErrorMessage => "Code must be unique.";
+    public string Reason => "Code must be unique.";
 }

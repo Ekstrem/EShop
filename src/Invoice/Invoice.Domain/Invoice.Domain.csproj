@@ -12,6 +12,7 @@
     <InternalsVisibleTo Include="EShop.IntegrationTests" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../../Shared/EShop.Contracts/EShop.Contracts.csproj" />
   </ItemGroup>
 </Project>

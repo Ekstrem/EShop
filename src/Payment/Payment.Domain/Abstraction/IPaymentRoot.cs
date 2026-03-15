@@ -1,8 +1,8 @@
 namespace Payment.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IPaymentRoot : IAggregateRoot<IPayment>
+public interface IPaymentRoot : IValueObject
 {
     Guid OrderId { get; }
     decimal Amount { get; }

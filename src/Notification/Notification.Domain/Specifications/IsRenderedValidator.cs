@@ -1,12 +1,11 @@
 namespace Notification.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Notification.Domain.Abstraction;
 
-internal sealed class IsRenderedValidator : IBusinessOperationValidator<INotificationAnemicModel>
+internal sealed class IsRenderedValidator
 {
     public bool IsSatisfiedBy(INotificationAnemicModel model)
         => model.Root.Status == "Rendered";
 
-    public string ErrorMessage => "Notification must be in Rendered status.";
+    public string Reason => "Notification must be in Rendered status.";
 }

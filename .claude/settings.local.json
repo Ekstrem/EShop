@@ -52,7 +52,25 @@
       "Bash(C:/Users/About/.dotnet/dotnet test:*)",
       "Bash(for ctx:*)",
       "Bash(do echo:*)",
-      "Read(//c/Users/About/Documents/GitHub/EShop/src/$ctx/$ctx.Domain/**)"
+      "Read(//c/Users/About/Documents/GitHub/EShop/src/$ctx/$ctx.Domain/**)",
+      "Bash(grep -v \"src$\")",
+      "Bash(/c/Users/About/.dotnet/dotnet build:*)",
+      "Bash(/c/Users/About/.dotnet/dotnet sln:*)",
+      "Bash(for f:*)",
+      "Read(//c/Users/About/Documents/GitHub/EShop/**)",
+      "Bash(/c/Users/About/.dotnet/dotnet /c/Users/About/.nuget/packages/ilspycmd/9.0.0.7891/tools/net8.0/any/ilspycmd.dll /c/Users/About/.nuget/packages/digitfactory.libraries.seedworks/0.5.0/lib/net8.0/DigiTFactory.Libraries.SeedWorks.dll)",
+      "Bash(while read:*)",
+      "Bash(do grep:*)",
+      "Bash(echo \"MISSING: $f\" done)",
+      "Bash(grep -v '//')",
+      "Bash(do sed:*)",
+      "Bash(if ! grep -q 'using EShop.Contracts;' \"$f\")",
+      "Bash(echo \"Missing using in: $f\")",
+      "Bash(do if:*)",
+      "Bash(then echo:*)",
+      "Bash(grep -l 'EShop.Contracts' src/AggregateRating/AggregateRating.Domain.Tests/*.csproj src/Review/Review.Domain.Tests/*.csproj src/EShop.IntegrationTests/*.csproj src/Shipment/Shipment.Domain.Tests/*.csproj src/ReturnRequest/ReturnRequest.Domain.Tests/*.csproj)",
+      "Bash(find /c/Users/About/.nuget/packages/digitfactory.libraries.seedworks -name *.dll)",
+      "Bash(/c/Users/About/.dotnet/dotnet test:*)"
     ]
   }
 }

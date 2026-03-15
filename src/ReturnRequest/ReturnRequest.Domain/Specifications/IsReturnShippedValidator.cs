@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using ReturnRequest.Domain.Abstraction;
 
 namespace ReturnRequest.Domain.Specifications;
@@ -6,10 +5,10 @@ namespace ReturnRequest.Domain.Specifications;
 /// <summary>
 /// Validates that the return request is in ReturnShipped status.
 /// </summary>
-public sealed class IsReturnShippedValidator : IBusinessOperationValidator<IReturnRequest, IReturnRequestAnemicModel>
+internal sealed class IsReturnShippedValidator
 {
     public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
         => model.Root.Status == "ReturnShipped";
 
-    public string ErrorMessage => "Return request must be in ReturnShipped status.";
+    public string Reason => "Return request must be in ReturnShipped status.";
 }

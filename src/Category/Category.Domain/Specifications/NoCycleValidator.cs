@@ -1,9 +1,8 @@
 namespace Category.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Category.Domain.Abstraction;
 
-internal sealed class NoCycleValidator : IBusinessOperationValidator<ICategoryAnemicModel>
+internal sealed class NoCycleValidator
 {
     private readonly IReadOnlyList<Guid> _ancestorIds;
 
@@ -15,5 +14,5 @@ internal sealed class NoCycleValidator : IBusinessOperationValidator<ICategoryAn
     public bool IsSatisfiedBy(ICategoryAnemicModel model)
         => true; // Cycle detection is validated via ancestor chain passed from application layer
 
-    public string ErrorMessage => "Moving would create a cycle in the category hierarchy.";
+    public string Reason => "Moving would create a cycle in the category hierarchy.";
 }

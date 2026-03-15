@@ -12,7 +12,8 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../Shared/EShop.Contracts/EShop.Contracts.csproj" />
     <ProjectReference Include="../Product/Product.Domain/Product.Domain.csproj" />
     <ProjectReference Include="../Category/Category.Domain/Category.Domain.csproj" />
     <ProjectReference Include="../StockItem/StockItem.Domain/StockItem.Domain.csproj" />

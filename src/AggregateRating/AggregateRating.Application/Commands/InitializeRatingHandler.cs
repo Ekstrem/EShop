@@ -1,19 +1,21 @@
 namespace AggregateRating.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using EShop.Contracts;
 using AggregateRating.Domain;
 using AggregateRating.Domain.Abstraction;
 using AggregateRating.Domain.Implementation;
+using AggregateRating.DomainServices;
 
 public sealed class InitializeRatingHandler
     : IRequestHandler<InitializeRatingCommand, AggregateResult<IAggregateRating, IAggregateRatingAnemicModel>>
 {
-    private readonly IAggregateProvider<IAggregateRating, IAggregateRatingAnemicModel> _provider;
+    private readonly AggregateProvider _provider;
 
-    public InitializeRatingHandler(
-        IAggregateProvider<IAggregateRating, IAggregateRatingAnemicModel> provider)
+    public InitializeRatingHandler(AggregateProvider provider)
     {
         _provider = provider;
     }

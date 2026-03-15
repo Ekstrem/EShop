@@ -1,18 +1,21 @@
 namespace StockItem.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using EShop.Contracts;
 using StockItem.Domain;
 using StockItem.Domain.Abstraction;
 using StockItem.Domain.Implementation;
+using StockItem.DomainServices;
 
 public sealed class ReserveStockHandler
     : IRequestHandler<ReserveStockCommand, AggregateResult<IStockItem, IStockItemAnemicModel>>
 {
-    private readonly IAggregateProvider<IStockItem, IStockItemAnemicModel> _provider;
+    private readonly AggregateProvider _provider;
 
-    public ReserveStockHandler(IAggregateProvider<IStockItem, IStockItemAnemicModel> provider)
+    public ReserveStockHandler(AggregateProvider provider)
     {
         _provider = provider;
     }
@@ -27,6 +30,6 @@ public sealed class ReserveStockHandler
         // var result = aggregate.ReserveStock(request.OrderId, request.Quantity);
         // await _repository.SaveAsync(result.Value);
         return Task.FromResult(
-            AggregateResult<IStockItem, IStockItemAnemicModel>.Fail("Not yet wired to repository."));
+            AggregateResultExtensions.FailResult<IStockItem, IStockItemAnemicModel>("Not yet wired to repository."));
     }
 }

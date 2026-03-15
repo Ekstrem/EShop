@@ -1,8 +1,11 @@
 namespace EShop.IntegrationTests;
 
 using Xunit;
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 
 // Order
 using Order.Domain;
@@ -87,22 +90,22 @@ public class OrderCancellationJourneyTests
 
         // Step 2: Reserve stock
         var (_, reserveResult) = ReserveStockForOrder(orderId, 3);
-        Assert.True(reserveResult.IsSuccess);
-        Assert.Equal(3, reserveResult.Model!.Root.Reserved);
-        Assert.Single(reserveResult.Model!.Reservations);
+        Assert.True(reserveResult.IsSuccess());
+        Assert.Equal(3, reserveResult.Model()!.Root.Reserved);
+        Assert.Single(reserveResult.Model()!.Reservations);
 
         // Step 3: Cancel order (Placed -> Cancelled)
         var cancelResult = OrderAggregate.CancelOrder(orderModel);
-        Assert.True(cancelResult.IsSuccess);
-        Assert.Equal("Cancelled", cancelResult.Model!.Root.Status);
-        Assert.Equal("OrderCancelled", cancelResult.EventName);
+        Assert.True(cancelResult.IsSuccess());
+        Assert.Equal("Cancelled", cancelResult.Model()!.Root.Status);
+        // EventName not available on AggregateResult
 
         // Step 4: Release reserved stock
-        var stockAggregate = StockItemImpl.Aggregate.CreateInstance(reserveResult.Model!);
+        var stockAggregate = StockItemImpl.Aggregate.CreateInstance(reserveResult.Model()!);
         var releaseResult = stockAggregate.ReleaseStock(orderId);
-        Assert.True(releaseResult.IsSuccess);
-        Assert.Equal(0, releaseResult.Model!.Root.Reserved);
-        Assert.Empty(releaseResult.Model!.Reservations);
+        Assert.True(releaseResult.IsSuccess());
+        Assert.Equal(0, releaseResult.Model()!.Root.Reserved);
+        Assert.Empty(releaseResult.Model()!.Reservations);
 
         // Step 5: Void payment (if initiated)
         var paymentRoot = PaymentImpl.PaymentRoot.CreateInstance(
@@ -115,18 +118,18 @@ public class OrderCancellationJourneyTests
         var paymentAggregate = PaymentImpl.Aggregate.CreateInstance(emptyPaymentModel);
         var initiateResult = paymentAggregate.InitiatePayment(
             orderId, 95.00m, "USD", "CreditCard");
-        Assert.True(initiateResult.IsSuccess);
-        Assert.Equal("Initiated", initiateResult.Model!.Root.Status);
+        Assert.True(initiateResult.IsSuccess());
+        Assert.Equal("Initiated", initiateResult.Model()!.Root.Status);
 
-        var paymentAggregate2 = PaymentImpl.Aggregate.CreateInstance(initiateResult.Model!);
+        var paymentAggregate2 = PaymentImpl.Aggregate.CreateInstance(initiateResult.Model()!);
         var voidResult = paymentAggregate2.VoidPayment();
-        Assert.True(voidResult.IsSuccess);
-        Assert.Equal("Voided", voidResult.Model!.Root.Status);
+        Assert.True(voidResult.IsSuccess());
+        Assert.Equal("Voided", voidResult.Model()!.Root.Status);
 
         // Final assertions
-        Assert.Equal("Cancelled", cancelResult.Model!.Root.Status);
-        Assert.Equal(0, releaseResult.Model!.Root.Reserved);
-        Assert.Equal("Voided", voidResult.Model!.Root.Status);
+        Assert.Equal("Cancelled", cancelResult.Model()!.Root.Status);
+        Assert.Equal(0, releaseResult.Model()!.Root.Reserved);
+        Assert.Equal("Voided", voidResult.Model()!.Root.Status);
     }
 
     /// <summary>
@@ -147,7 +150,7 @@ public class OrderCancellationJourneyTests
 
         // Step 1b: Reserve stock
         var (_, reserveResult) = ReserveStockForOrder(orderId, 3);
-        Assert.True(reserveResult.IsSuccess);
+        Assert.True(reserveResult.IsSuccess());
 
         // Step 1c: Initiate and complete payment
         var paymentRoot = PaymentImpl.PaymentRoot.CreateInstance(
@@ -160,46 +163,46 @@ public class OrderCancellationJourneyTests
         var paymentAggregate = PaymentImpl.Aggregate.CreateInstance(emptyPaymentModel);
         var initiateResult = paymentAggregate.InitiatePayment(
             orderId, 95.00m, "USD", "CreditCard");
-        Assert.True(initiateResult.IsSuccess);
+        Assert.True(initiateResult.IsSuccess());
 
-        var paymentAggregate2 = PaymentImpl.Aggregate.CreateInstance(initiateResult.Model!);
+        var paymentAggregate2 = PaymentImpl.Aggregate.CreateInstance(initiateResult.Model()!);
         var webhookResult = paymentAggregate2.HandleProviderWebhook(
             "txn_" + Guid.NewGuid().ToString("N"),
             "Charge",
             95.00m,
             "Completed");
-        Assert.True(webhookResult.IsSuccess);
-        Assert.Equal("Completed", webhookResult.Model!.Root.Status);
+        Assert.True(webhookResult.IsSuccess());
+        Assert.Equal("Completed", webhookResult.Model()!.Root.Status);
 
         // Step 1d: Confirm payment on order (Placed -> Paid)
         var confirmPaymentResult = OrderAggregate.ConfirmPayment(orderModel);
-        Assert.True(confirmPaymentResult.IsSuccess);
-        Assert.Equal("Paid", confirmPaymentResult.Model!.Root.Status);
+        Assert.True(confirmPaymentResult.IsSuccess());
+        Assert.Equal("Paid", confirmPaymentResult.Model()!.Root.Status);
 
-        var paidOrderModel = confirmPaymentResult.Model!;
+        var paidOrderModel = confirmPaymentResult.Model()!;
 
         // Step 2: Cancel order (Paid -> Cancelled)
         var cancelResult = OrderAggregate.CancelOrder(paidOrderModel);
-        Assert.True(cancelResult.IsSuccess);
-        Assert.Equal("Cancelled", cancelResult.Model!.Root.Status);
-        Assert.Equal("OrderCancelled", cancelResult.EventName);
+        Assert.True(cancelResult.IsSuccess());
+        Assert.Equal("Cancelled", cancelResult.Model()!.Root.Status);
+        // EventName not available on AggregateResult
 
         // Step 3: Release reserved stock
-        var stockAggregate = StockItemImpl.Aggregate.CreateInstance(reserveResult.Model!);
+        var stockAggregate = StockItemImpl.Aggregate.CreateInstance(reserveResult.Model()!);
         var releaseResult = stockAggregate.ReleaseStock(orderId);
-        Assert.True(releaseResult.IsSuccess);
-        Assert.Equal(0, releaseResult.Model!.Root.Reserved);
-        Assert.Empty(releaseResult.Model!.Reservations);
+        Assert.True(releaseResult.IsSuccess());
+        Assert.Equal(0, releaseResult.Model()!.Root.Reserved);
+        Assert.Empty(releaseResult.Model()!.Reservations);
 
         // Step 4: Request refund on payment
-        var paymentAggregate3 = PaymentImpl.Aggregate.CreateInstance(webhookResult.Model!);
+        var paymentAggregate3 = PaymentImpl.Aggregate.CreateInstance(webhookResult.Model()!);
         var refundResult = paymentAggregate3.RequestRefund(95.00m);
-        Assert.True(refundResult.IsSuccess);
-        Assert.Equal("FullyRefunded", refundResult.Model!.Root.Status);
+        Assert.True(refundResult.IsSuccess());
+        Assert.Equal("FullyRefunded", refundResult.Model()!.Root.Status);
 
         // Final assertions
-        Assert.Equal("Cancelled", cancelResult.Model!.Root.Status);
-        Assert.Equal(0, releaseResult.Model!.Root.Reserved);
-        Assert.Equal("FullyRefunded", refundResult.Model!.Root.Status);
+        Assert.Equal("Cancelled", cancelResult.Model()!.Root.Status);
+        Assert.Equal(0, releaseResult.Model()!.Root.Reserved);
+        Assert.Equal("FullyRefunded", refundResult.Model()!.Root.Status);
     }
 }

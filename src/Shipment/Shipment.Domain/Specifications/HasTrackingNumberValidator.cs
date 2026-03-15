@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Shipment.Domain.Abstraction;
 
 namespace Shipment.Domain.Specifications;
@@ -6,10 +5,10 @@ namespace Shipment.Domain.Specifications;
 /// <summary>
 /// Validates that the shipment has a tracking number assigned.
 /// </summary>
-public sealed class HasTrackingNumberValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
+internal sealed class HasTrackingNumberValidator
 {
     public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => !string.IsNullOrWhiteSpace(model.Root.TrackingNumber);
 
-    public string ErrorMessage => "Shipment must have a tracking number assigned.";
+    public string Reason => "Shipment must have a tracking number assigned.";
 }

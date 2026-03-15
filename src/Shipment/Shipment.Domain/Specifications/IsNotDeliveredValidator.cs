@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Shipment.Domain.Abstraction;
 
 namespace Shipment.Domain.Specifications;
@@ -6,10 +5,10 @@ namespace Shipment.Domain.Specifications;
 /// <summary>
 /// Validates that the shipment has not yet been delivered.
 /// </summary>
-public sealed class IsNotDeliveredValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
+internal sealed class IsNotDeliveredValidator
 {
     public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Root.Status != "Delivered";
 
-    public string ErrorMessage => "Shipment has already been delivered.";
+    public string Reason => "Shipment has already been delivered.";
 }

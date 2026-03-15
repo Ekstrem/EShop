@@ -1,8 +1,11 @@
 namespace EShop.IntegrationTests;
 
 using Xunit;
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 
 using Category.Domain.Abstraction;
 using Category.Domain.Implementation;
@@ -37,11 +40,11 @@ public class CatalogSetupJourneyTests
             sortOrder: 1,
             siblingNames: new List<string>());
 
-        Assert.True(parentCatResult.IsSuccess);
-        Assert.Equal("Electronics", parentCatResult.Model!.Root.Name);
-        Assert.Null(parentCatResult.Model.Root.ParentId);
-        Assert.Equal(0, parentCatResult.Model.Root.Depth);
-        Assert.Equal("Active", parentCatResult.Model.Root.Status);
+        Assert.True(parentCatResult.IsSuccess());
+        Assert.Equal("Electronics", parentCatResult.Model()!.Root.Name);
+        Assert.Null(parentCatResult.Model().Root.ParentId);
+        Assert.Equal(0, parentCatResult.Model().Root.Depth);
+        Assert.Equal("Active", parentCatResult.Model().Root.Status);
 
         // Simulate persistence assigning an ID
         var parentCategoryId = Guid.NewGuid();
@@ -55,11 +58,11 @@ public class CatalogSetupJourneyTests
             sortOrder: 1,
             siblingNames: new List<string>());
 
-        Assert.True(childCatResult.IsSuccess);
-        Assert.Equal("Laptop Accessories", childCatResult.Model!.Root.Name);
-        Assert.Equal(parentCategoryId, childCatResult.Model.Root.ParentId);
-        Assert.Equal(1, childCatResult.Model.Root.Depth);
-        Assert.Equal("Active", childCatResult.Model.Root.Status);
+        Assert.True(childCatResult.IsSuccess());
+        Assert.Equal("Laptop Accessories", childCatResult.Model()!.Root.Name);
+        Assert.Equal(parentCategoryId, childCatResult.Model().Root.ParentId);
+        Assert.Equal(1, childCatResult.Model().Root.Depth);
+        Assert.Equal("Active", childCatResult.Model().Root.Status);
 
         var childCategoryId = Guid.NewGuid();
 
@@ -83,21 +86,21 @@ public class CatalogSetupJourneyTests
             variants: variants,
             media: media);
 
-        Assert.True(prodResult.IsSuccess);
-        Assert.Equal("Ergonomic Laptop Stand", prodResult.Model!.Root.Name);
-        Assert.Equal(childCategoryId, prodResult.Model.Root.CategoryId);
-        Assert.Equal("Draft", prodResult.Model.Root.Status);
-        Assert.Equal(2, prodResult.Model.Variants.Count);
-        Assert.Equal(2, prodResult.Model.Media.Count);
+        Assert.True(prodResult.IsSuccess());
+        Assert.Equal("Ergonomic Laptop Stand", prodResult.Model()!.Root.Name);
+        Assert.Equal(childCategoryId, prodResult.Model().Root.CategoryId);
+        Assert.Equal("Draft", prodResult.Model().Root.Status);
+        Assert.Equal(2, prodResult.Model().Variants.Count);
+        Assert.Equal(2, prodResult.Model().Media.Count);
 
         // Step 4: Publish the product (requires at least one variant and one image)
-        var publishAggregate = ProductAggregate.CreateInstance(prodResult.Model);
+        var publishAggregate = ProductAggregate.CreateInstance(prodResult.Model());
         var publishResult = publishAggregate.PublishProduct();
 
-        Assert.True(publishResult.IsSuccess);
-        Assert.Equal("Published", publishResult.Model!.Root.Status);
-        Assert.Equal("Ergonomic Laptop Stand", publishResult.Model.Root.Name);
-        Assert.Equal(2, publishResult.Model.Variants.Count);
+        Assert.True(publishResult.IsSuccess());
+        Assert.Equal("Published", publishResult.Model()!.Root.Status);
+        Assert.Equal("Ergonomic Laptop Stand", publishResult.Model().Root.Name);
+        Assert.Equal(2, publishResult.Model().Variants.Count);
 
         // Step 5: Initialize stock for the first variant (Black) in a warehouse
         var variantId = Guid.NewGuid(); // simulates the persisted variant ID
@@ -119,18 +122,18 @@ public class CatalogSetupJourneyTests
         // Replenish stock with initial inventory
         var replenishResult = stockAggregate.ReplenishStock(100);
 
-        Assert.True(replenishResult.IsSuccess);
-        Assert.Equal(100, replenishResult.Model!.Root.Total);
-        Assert.Equal(0, replenishResult.Model.Root.Reserved);
-        Assert.Equal("InStock", replenishResult.Model.Root.Status);
+        Assert.True(replenishResult.IsSuccess());
+        Assert.Equal(100, replenishResult.Model()!.Root.Total);
+        Assert.Equal(0, replenishResult.Model().Root.Reserved);
+        Assert.Equal("InStock", replenishResult.Model().Root.Status);
 
         // Step 6: Replenish additional stock (second batch)
-        var stockAggregate2 = StockAggregate.CreateInstance(replenishResult.Model);
+        var stockAggregate2 = StockAggregate.CreateInstance(replenishResult.Model());
         var secondReplenish = stockAggregate2.ReplenishStock(50);
 
-        Assert.True(secondReplenish.IsSuccess);
-        Assert.Equal(150, secondReplenish.Model!.Root.Total);
-        Assert.Equal("InStock", secondReplenish.Model.Root.Status);
+        Assert.True(secondReplenish.IsSuccess());
+        Assert.Equal(150, secondReplenish.Model()!.Root.Total);
+        Assert.Equal("InStock", secondReplenish.Model().Root.Status);
     }
 
     [Fact]
@@ -151,15 +154,15 @@ public class CatalogSetupJourneyTests
             variants: variants,
             media: media);
 
-        Assert.True(prodResult.IsSuccess);
-        Assert.Equal("Draft", prodResult.Model!.Root.Status);
+        Assert.True(prodResult.IsSuccess());
+        Assert.Equal("Draft", prodResult.Model()!.Root.Status);
 
         // Attempt to publish - should fail because no image
-        var publishAggregate = ProductAggregate.CreateInstance(prodResult.Model);
+        var publishAggregate = ProductAggregate.CreateInstance(prodResult.Model());
         var publishResult = publishAggregate.PublishProduct();
 
-        Assert.False(publishResult.IsSuccess);
-        Assert.Contains("image", publishResult.ErrorMessage!, StringComparison.OrdinalIgnoreCase);
+        Assert.False(publishResult.IsSuccess());
+        Assert.Contains("image", publishResult.ErrorMessage()!, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -174,8 +177,8 @@ public class CatalogSetupJourneyTests
             sortOrder: 1,
             siblingNames: new List<string>());
 
-        Assert.False(result.IsSuccess);
-        Assert.Contains("depth", result.ErrorMessage!, StringComparison.OrdinalIgnoreCase);
+        Assert.False(result.IsSuccess());
+        Assert.Contains("depth", result.ErrorMessage()!, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -189,8 +192,8 @@ public class CatalogSetupJourneyTests
             sortOrder: 2,
             siblingNames: new List<string> { "Electronics", "Books" });
 
-        Assert.False(result.IsSuccess);
-        Assert.Contains("unique", result.ErrorMessage!, StringComparison.OrdinalIgnoreCase);
+        Assert.False(result.IsSuccess());
+        Assert.Contains("unique", result.ErrorMessage()!, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -208,7 +211,7 @@ public class CatalogSetupJourneyTests
         var stockAggregate = StockAggregate.CreateInstance(stockModel);
         var result = stockAggregate.ReplenishStock(0);
 
-        Assert.False(result.IsSuccess);
-        Assert.Contains("greater than zero", result.ErrorMessage!, StringComparison.OrdinalIgnoreCase);
+        Assert.False(result.IsSuccess());
+        Assert.Contains("greater than zero", result.ErrorMessage()!, StringComparison.OrdinalIgnoreCase);
     }
 }

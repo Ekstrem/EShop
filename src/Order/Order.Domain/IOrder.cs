@@ -1,11 +1,5 @@
 namespace Order.Domain;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
 
 public interface IOrder : IBoundedContext { }
-
-public class OrderBoundedContextDescription : IBoundedContextDescription
-{
-    public string ContextName => "Order";
-    public int MicroserviceVersion => 1;
-}

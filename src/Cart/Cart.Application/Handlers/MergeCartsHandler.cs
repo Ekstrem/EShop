@@ -1,7 +1,10 @@
 namespace Cart.Application.Handlers;
 
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 using Cart.Domain.Aggregate;
@@ -35,10 +38,10 @@ public class MergeCartsHandler : IRequestHandler<MergeCartsCommand, AggregateRes
 
         var activeValidator = new IsActiveCartValidator();
         if (!activeValidator.IsSatisfiedBy(target))
-            throw new InvalidOperationException("Target cart: " + activeValidator.ErrorMessage);
+            throw new InvalidOperationException("Target cart: " + activeValidator.Reason);
 
         if (!activeValidator.IsSatisfiedBy(source))
-            throw new InvalidOperationException("Source cart: " + activeValidator.ErrorMessage);
+            throw new InvalidOperationException("Source cart: " + activeValidator.Reason);
 
         var result = CartAggregate.MergeCarts(target, source);
 

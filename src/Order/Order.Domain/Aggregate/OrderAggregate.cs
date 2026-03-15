@@ -1,12 +1,30 @@
 namespace Order.Domain.Aggregate;
 
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Order.Domain.Abstraction;
 using Order.Domain.Implementation;
+using EShop.Contracts;
 
 public static class OrderAggregate
 {
+    private static AggregateResult<IOrder, IOrderAnemicModel> Success(
+        IOrderAnemicModel oldModel, IOrderAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IOrder, IOrderAnemicModel>
+            .Commit<IOrder, IOrderAnemicModel>(oldModel, newModel);
+        return new AggregateResultSuccess<IOrder, IOrderAnemicModel>(data);
+    }
+
+    private static AggregateResult<IOrder, IOrderAnemicModel> Fail(
+        IOrderAnemicModel model, string error)
+    {
+        var data = BusinessOperationData<IOrder, IOrderAnemicModel>
+            .Commit<IOrder, IOrderAnemicModel>(model, model);
+        return new AggregateResultException<IOrder, IOrderAnemicModel>(
+            data, new FailedSpecification<IOrder, IOrderAnemicModel>(error));
+    }
+
     public static AggregateResult<IOrder, IOrderAnemicModel> ConfirmPayment(
         IOrderAnemicModel model)
     {
@@ -24,7 +42,7 @@ public static class OrderAggregate
             OrderTotal = model.OrderTotal
         };
 
-        return AggregateResult<IOrder, IOrderAnemicModel>.Create(newModel, "PaymentConfirmed");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<IOrder, IOrderAnemicModel> CancelOrder(
@@ -44,7 +62,7 @@ public static class OrderAggregate
             OrderTotal = model.OrderTotal
         };
 
-        return AggregateResult<IOrder, IOrderAnemicModel>.Create(newModel, "OrderCancelled");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<IOrder, IOrderAnemicModel> ConfirmShipment(
@@ -64,7 +82,7 @@ public static class OrderAggregate
             OrderTotal = model.OrderTotal
         };
 
-        return AggregateResult<IOrder, IOrderAnemicModel>.Create(newModel, "ShipmentConfirmed");
+        return Success(model, newModel);
     }
 
     public static AggregateResult<IOrder, IOrderAnemicModel> ConfirmDelivery(
@@ -84,6 +102,6 @@ public static class OrderAggregate
             OrderTotal = model.OrderTotal
         };
 
-        return AggregateResult<IOrder, IOrderAnemicModel>.Create(newModel, "DeliveryConfirmed");
+        return Success(model, newModel);
     }
 }

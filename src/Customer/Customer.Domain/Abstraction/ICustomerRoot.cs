@@ -1,11 +1,11 @@
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Abstraction;
+
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 /// <summary>
 /// Aggregate root for the Customer bounded context.
 /// </summary>
-public interface ICustomerRoot : IAggregateRoot<ICustomer>
+public interface ICustomerRoot : IValueObject
 {
     Guid Id { get; }
     string Email { get; }

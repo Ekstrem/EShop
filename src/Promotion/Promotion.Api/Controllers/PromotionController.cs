@@ -1,3 +1,4 @@
+using EShop.Contracts;
 namespace Promotion.Api.Controllers;
 
 using MediatR;
@@ -22,7 +23,7 @@ public sealed class PromotionController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}")]
@@ -36,7 +37,7 @@ public sealed class PromotionController : ControllerBase
             request.DiscountValue, request.StartDate, request.EndDate,
             request.Conditions, request.AllowStacking);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/activate")]
@@ -44,7 +45,7 @@ public sealed class PromotionController : ControllerBase
     {
         var command = new ActivatePromotionCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut("{id:guid}/deactivate")]
@@ -52,7 +53,7 @@ public sealed class PromotionController : ControllerBase
     {
         var command = new DeactivatePromotionCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.IsSuccess() ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("{id:guid}")]

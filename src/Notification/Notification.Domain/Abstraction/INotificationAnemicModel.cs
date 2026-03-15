@@ -1,6 +1,6 @@
 namespace Notification.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 public interface INotificationAnemicModel : IAnemicModel<INotification>
 {

@@ -1,5 +1,8 @@
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
@@ -51,7 +54,7 @@ public sealed class CompleteReturnCommandHandler
             RefundAmount = request.RefundAmount
         };
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.Create(model, "CompleteReturn");
+        var result = AggregateResultExtensions.CreateResult<IReturnRequest, IReturnRequestAnemicModel>(model, "CompleteReturn");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
         _notifier.Notify(result);

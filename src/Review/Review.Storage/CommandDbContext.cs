@@ -1,6 +1,8 @@
 namespace Review.Storage;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Review.Domain;
 using Review.Domain.Abstraction;
 

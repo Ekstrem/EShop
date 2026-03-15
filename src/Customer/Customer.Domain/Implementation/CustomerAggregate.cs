@@ -1,8 +1,9 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Implementation;
+
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using Customer.Domain.Abstraction;
+using EShop.Contracts;
 
 /// <summary>
 /// Customer aggregate containing all business operations.
@@ -10,8 +11,23 @@ namespace Customer.Domain.Implementation;
 /// </summary>
 public sealed class CustomerAggregate
 {
-    private CustomerAggregate()
+    private CustomerAggregate() { }
+
+    private static AggregateResult<ICustomer, ICustomerAnemicModel> Success(
+        ICustomerAnemicModel oldModel, ICustomerAnemicModel newModel)
     {
+        var data = BusinessOperationData<ICustomer, ICustomerAnemicModel>
+            .Commit<ICustomer, ICustomerAnemicModel>(oldModel, newModel);
+        return new AggregateResultSuccess<ICustomer, ICustomerAnemicModel>(data);
+    }
+
+    private static AggregateResult<ICustomer, ICustomerAnemicModel> Fail(
+        ICustomerAnemicModel model, string error)
+    {
+        var data = BusinessOperationData<ICustomer, ICustomerAnemicModel>
+            .Commit<ICustomer, ICustomerAnemicModel>(model, model);
+        return new AggregateResultException<ICustomer, ICustomerAnemicModel>(
+            data, new FailedSpecification<ICustomer, ICustomerAnemicModel>(error));
     }
 
     /// <summary>
@@ -30,8 +46,12 @@ public sealed class CustomerAggregate
         var consents = new List<IConsent>().AsReadOnly();
         var model = CustomerAnemicModel.CreateInstance(id, root, addressBook, consents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(RegisterCustomer));
+        var empty = CustomerAnemicModel.CreateInstance(
+            Guid.Empty,
+            CustomerRoot.CreateInstance(Guid.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+            AddressBook.Empty(),
+            new List<IConsent>().AsReadOnly());
+        return Success(empty, model);
     }
 
     /// <summary>
@@ -50,8 +70,7 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(
             current.Id, root, current.AddressBook, current.Consents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(VerifyEmail));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -73,8 +92,7 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(
             current.Id, root, addressBook, current.Consents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(UpdateProfile));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -94,8 +112,7 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(
             current.Id, root, current.AddressBook, current.Consents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(ChangePassword));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -104,8 +121,7 @@ public sealed class CustomerAggregate
     public static AggregateResult<ICustomer, ICustomerAnemicModel> RequestPasswordReset(
         ICustomerAnemicModel current)
     {
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(current, nameof(RequestPasswordReset));
+        return Success(current, current);
     }
 
     /// <summary>
@@ -125,8 +141,7 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(
             current.Id, root, current.AddressBook, current.Consents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(ResetPassword));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -146,8 +161,7 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(
             current.Id, current.Root, current.AddressBook, updatedConsents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(UpdateConsent));
+        return Success(current, model);
     }
 
     /// <summary>
@@ -169,7 +183,6 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(
             current.Id, root, emptyAddressBook, clearedConsents);
 
-        return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .Create(model, nameof(DeactivateAccount));
+        return Success(current, model);
     }
 }

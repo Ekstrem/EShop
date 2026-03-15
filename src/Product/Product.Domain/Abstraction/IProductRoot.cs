@@ -1,8 +1,8 @@
 namespace Product.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IProductRoot : IAggregateRoot<IProduct>
+public interface IProductRoot : IValueObject
 {
     string Name { get; }
     string Description { get; }

@@ -1,11 +1,11 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
 namespace Shipment.Domain.Abstraction;
 
 /// <summary>
 /// Aggregate root for the Shipment bounded context.
 /// </summary>
-public interface IShipmentRoot : IAggregateRoot<IShipment>
+public interface IShipmentRoot : IValueObject
 {
     Guid OrderId { get; }
     string TrackingNumber { get; }
