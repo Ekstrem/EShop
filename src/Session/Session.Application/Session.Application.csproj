@@ -5,12 +5,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../../Shared/EShop.Contracts/EShop.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..$CTX.Domain$CTX.Domain.csproj" />
-    <ProjectReference Include="..$CTX.DomainServices$CTX.DomainServices.csproj" />
-    <ProjectReference Include="..$CTX.InternalContracts$CTX.InternalContracts.csproj" />
+    <ProjectReference Include="../Session.Domain/Session.Domain.csproj" />
+    <ProjectReference Include="../Session.DomainServices/Session.DomainServices.csproj" />
+    <ProjectReference Include="../Session.InternalContracts/Session.InternalContracts.csproj" />
   </ItemGroup>
 </Project>

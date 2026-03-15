@@ -3,7 +3,11 @@ using Customer.Domain.Abstraction;
 using Customer.Domain.Implementation;
 using Customer.Domain.Specifications;
 using Customer.DomainServices;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 
 namespace Customer.Application.Commands;
@@ -29,7 +33,7 @@ public sealed class UpdateProfileCommandHandler
 
         var activeValidator = IsActiveValidator.CreateInstance();
         if (!activeValidator.IsSatisfiedBy(current))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         var addresses = request.Addresses
             .Select(a => (IAddress)Address.CreateInstance(
@@ -42,7 +46,7 @@ public sealed class UpdateProfileCommandHandler
         var tempModel = CustomerAnemicModel.CreateInstance(
             current.Id, current.Root, addressBook, current.Consents);
         if (!addressLimitValidator.IsSatisfiedBy(tempModel))
-            throw new InvalidOperationException(addressLimitValidator.ErrorMessage);
+            throw new InvalidOperationException(addressLimitValidator.Reason);
 
         var result = CustomerAggregate.UpdateProfile(
             current, request.FirstName, request.LastName, addressBook);

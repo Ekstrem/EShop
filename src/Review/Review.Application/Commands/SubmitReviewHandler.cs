@@ -1,21 +1,24 @@
 namespace Review.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using EShop.Contracts;
 using Review.Domain;
 using Review.Domain.Abstraction;
 using Review.Domain.Implementation;
+using Review.DomainServices;
 using Review.InternalContracts;
 
 public sealed class SubmitReviewHandler
     : IRequestHandler<SubmitReviewCommand, AggregateResult<IReview, IReviewAnemicModel>>
 {
-    private readonly IAggregateProvider<IReview, IReviewAnemicModel> _provider;
+    private readonly AggregateProvider _provider;
     private readonly IReviewQueryRepository _queryRepository;
 
     public SubmitReviewHandler(
-        IAggregateProvider<IReview, IReviewAnemicModel> provider,
+        AggregateProvider provider,
         IReviewQueryRepository queryRepository)
     {
         _provider = provider;

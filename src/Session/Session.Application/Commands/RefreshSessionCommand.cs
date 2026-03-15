@@ -1,4 +1,8 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using MediatR;
 using Session.Domain;
 using Session.Domain.Abstraction;

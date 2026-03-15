@@ -1,8 +1,6 @@
 namespace Category.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
-
-internal sealed class UniqueNameAmongSiblingsValidator : IBusinessOperationValidator<string>
+internal sealed class UniqueNameAmongSiblingsValidator
 {
     private readonly IReadOnlyList<string> _siblingNames;
 
@@ -14,5 +12,5 @@ internal sealed class UniqueNameAmongSiblingsValidator : IBusinessOperationValid
     public bool IsSatisfiedBy(string name)
         => !_siblingNames.Any(n => string.Equals(n, name, StringComparison.OrdinalIgnoreCase));
 
-    public string ErrorMessage => "Category name must be unique among siblings.";
+    public string Reason => "Category name must be unique among siblings.";
 }

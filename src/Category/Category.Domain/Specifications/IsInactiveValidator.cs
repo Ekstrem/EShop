@@ -1,12 +1,11 @@
 namespace Category.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Category.Domain.Abstraction;
 
-internal sealed class IsInactiveValidator : IBusinessOperationValidator<ICategoryAnemicModel>
+internal sealed class IsInactiveValidator
 {
     public bool IsSatisfiedBy(ICategoryAnemicModel model)
         => model.Root.Status == "Inactive";
 
-    public string ErrorMessage => "Category must be in Inactive status.";
+    public string Reason => "Category must be in Inactive status.";
 }

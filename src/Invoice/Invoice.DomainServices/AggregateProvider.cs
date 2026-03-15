@@ -1,6 +1,8 @@
 namespace Invoice.DomainServices;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Invoice.Domain;
 using Invoice.Domain.Abstraction;
 using Invoice.InternalContracts;

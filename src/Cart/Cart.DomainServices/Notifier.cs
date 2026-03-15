@@ -1,16 +1,27 @@
 namespace Cart.DomainServices;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 
-public class Notifier : IObserver<AggregateResult<ICart, ICartAnemicModel>>
+public class Notifier : INotifier<ICart>, IObserver<AggregateResult<ICart, ICartAnemicModel>>
 {
     private readonly IObserver<AggregateResult<ICart, ICartAnemicModel>> _inner;
 
     public Notifier(IObserver<AggregateResult<ICart, ICartAnemicModel>> inner)
     {
         _inner = inner;
+    }
+
+    public void Notify<TModel>(AggregateResult<ICart, TModel> result)
+        where TModel : IAnemicModel<ICart>
+    {
     }
 
     public void OnCompleted()

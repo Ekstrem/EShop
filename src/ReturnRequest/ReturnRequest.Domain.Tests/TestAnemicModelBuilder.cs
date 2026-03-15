@@ -1,3 +1,4 @@
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 using ReturnRequest.Domain.Abstraction;
 
 namespace ReturnRequest.Domain.Tests;
@@ -52,10 +53,17 @@ internal static class TestAnemicModelBuilder
 
     private sealed class TestReturnRequestAnemicModel : IReturnRequestAnemicModel
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public IReturnRequestRoot Root { get; init; } = null!;
         public IReadOnlyList<IReturnItem> Items { get; init; } = new List<IReturnItem>();
         public IReturnLabel? ReturnLabel { get; init; }
         public decimal RefundAmount { get; init; }
+        public long Version { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        public string CommandName { get; set; } = string.Empty;
+        public string SubjectName { get; set; } = string.Empty;
+        public Guid CorrelationToken { get; set; } = Guid.NewGuid();
+        public IDictionary<string, IValueObject> Invariants => GetValueObjects();
+        public IDictionary<string, IValueObject> GetValueObjects() => new Dictionary<string, IValueObject>();
     }
 
     private sealed class TestReturnRequestRoot : IReturnRequestRoot

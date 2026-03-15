@@ -1,6 +1,7 @@
 namespace Payment.Application.Commands;
 
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using MediatR;
 using Payment.Domain;
 using Payment.Domain.Abstraction;

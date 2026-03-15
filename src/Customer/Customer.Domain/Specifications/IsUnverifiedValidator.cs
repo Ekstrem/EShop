@@ -1,16 +1,13 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Specifications;
+
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the customer status is Unverified.
 /// </summary>
-public sealed class IsUnverifiedValidator : IBusinessOperationValidator<ICustomer, ICustomerAnemicModel>
+public sealed class IsUnverifiedValidator
 {
-    private IsUnverifiedValidator()
-    {
-    }
+    private IsUnverifiedValidator() { }
 
     public static IsUnverifiedValidator CreateInstance()
     {
@@ -22,5 +19,5 @@ public sealed class IsUnverifiedValidator : IBusinessOperationValidator<ICustome
         return model.Root.Status == "Unverified";
     }
 
-    public string ErrorMessage => "Customer must be in Unverified status.";
+    public string Reason => "Customer must be in Unverified status.";
 }

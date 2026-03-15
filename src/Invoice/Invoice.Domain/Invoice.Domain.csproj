@@ -5,6 +5,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
+    <InternalsVisibleTo Include="Invoice.DomainServices" />
+    <InternalsVisibleTo Include="Invoice.Application" />
+    <InternalsVisibleTo Include="Invoice.Storage" />
+    <InternalsVisibleTo Include="Invoice.Domain.Tests" />
+    <InternalsVisibleTo Include="EShop.IntegrationTests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../../Shared/EShop.Contracts/EShop.Contracts.csproj" />
   </ItemGroup>
 </Project>

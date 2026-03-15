@@ -1,4 +1,5 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using Session.Domain;
 using Session.Domain.Abstraction;
 
@@ -9,16 +10,11 @@ namespace Session.DomainServices;
 /// </summary>
 public sealed class BusAdapter : IObserver<AggregateResult<ISession, ISessionAnemicModel>>
 {
-    private readonly IEventBus _eventBus;
-
-    public BusAdapter(IEventBus eventBus)
-    {
-        _eventBus = eventBus;
-    }
+    public BusAdapter() { }
 
     public void OnNext(AggregateResult<ISession, ISessionAnemicModel> value)
     {
-        _eventBus.Publish(value);
+        // Publish domain events to event bus (stub).
     }
 
     public void OnError(Exception error)

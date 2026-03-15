@@ -11,7 +11,7 @@ public sealed class ItemNotAlreadyReturnedValidatorTests
         var alreadyReturned = new List<Guid>();
         var validator = new ItemNotAlreadyReturnedValidator(alreadyReturned);
         var model = TestAnemicModelBuilder.Build(itemCount: 2);
-        Assert.True(validator.IsValid(model));
+        Assert.True(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -20,7 +20,7 @@ public sealed class ItemNotAlreadyReturnedValidatorTests
         var model = TestAnemicModelBuilder.Build(itemCount: 1);
         var alreadyReturned = model.Items.Select(i => i.VariantId).ToList();
         var validator = new ItemNotAlreadyReturnedValidator(alreadyReturned);
-        Assert.False(validator.IsValid(model));
+        Assert.False(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -29,6 +29,6 @@ public sealed class ItemNotAlreadyReturnedValidatorTests
         var alreadyReturned = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
         var validator = new ItemNotAlreadyReturnedValidator(alreadyReturned);
         var model = TestAnemicModelBuilder.Build(itemCount: 2);
-        Assert.True(validator.IsValid(model));
+        Assert.True(validator.IsSatisfiedBy(model));
     }
 }

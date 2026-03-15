@@ -1,12 +1,11 @@
-using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
-
 namespace Customer.Domain.Specifications;
+
+using Customer.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the provided old password hash matches the current password hash.
 /// </summary>
-public sealed class PasswordMatchValidator : IBusinessOperationValidator<ICustomer, ICustomerAnemicModel>
+public sealed class PasswordMatchValidator
 {
     private readonly string _oldPasswordHash;
 
@@ -25,5 +24,5 @@ public sealed class PasswordMatchValidator : IBusinessOperationValidator<ICustom
         return model.Root.PasswordHash == _oldPasswordHash;
     }
 
-    public string ErrorMessage => "The current password is incorrect.";
+    public string Reason => "The current password is incorrect.";
 }

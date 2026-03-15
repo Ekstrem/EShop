@@ -10,5 +10,5 @@ internal sealed class RefundAmountValidator
         return requestedRefundAmount > 0 && requestedRefundAmount <= remainingRefundable;
     }
 
-    public string ErrorMessage => "Refund amount exceeds the remaining refundable amount.";
+    public string Reason => "Refund amount exceeds the remaining refundable amount.";
 }

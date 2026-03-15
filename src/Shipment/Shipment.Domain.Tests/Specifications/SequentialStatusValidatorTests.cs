@@ -10,7 +10,7 @@ public sealed class SequentialStatusValidatorTests
     {
         var validator = new SequentialStatusValidator("Packed");
         var model = TestAnemicModelBuilder.Build(status: "Pending");
-        Assert.True(validator.IsValid(model));
+        Assert.True(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -18,7 +18,7 @@ public sealed class SequentialStatusValidatorTests
     {
         var validator = new SequentialStatusValidator("Pending");
         var model = TestAnemicModelBuilder.Build(status: "Packed");
-        Assert.False(validator.IsValid(model));
+        Assert.False(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public sealed class SequentialStatusValidatorTests
     {
         var validator = new SequentialStatusValidator("Shipped");
         var model = TestAnemicModelBuilder.Build(status: "Shipped");
-        Assert.False(validator.IsValid(model));
+        Assert.False(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -34,6 +34,6 @@ public sealed class SequentialStatusValidatorTests
     {
         var validator = new SequentialStatusValidator("Delivered");
         var model = TestAnemicModelBuilder.Build(status: "Shipped");
-        Assert.True(validator.IsValid(model));
+        Assert.True(validator.IsSatisfiedBy(model));
     }
 }

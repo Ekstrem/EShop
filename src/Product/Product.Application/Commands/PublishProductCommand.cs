@@ -1,7 +1,8 @@
 namespace Product.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using Product.Domain;
 using Product.Domain.Abstraction;
 

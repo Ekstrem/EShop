@@ -1,15 +1,33 @@
 namespace Category.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Category.Domain.Abstraction;
 using Category.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(ICategoryAnemicModel model) : base(model) { }
+    public ICategoryAnemicModel Model { get; }
+
+    private Aggregate(ICategoryAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(ICategoryAnemicModel model) => new(model);
+
+    private AggregateResult<ICategory, ICategoryAnemicModel> Success(ICategoryAnemicModel newModel)
+    {
+        var data = BusinessOperationData<ICategory, ICategoryAnemicModel>
+            .Commit<ICategory, ICategoryAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<ICategory, ICategoryAnemicModel>(data);
+    }
+
+    private AggregateResult<ICategory, ICategoryAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<ICategory, ICategoryAnemicModel>
+            .Commit<ICategory, ICategoryAnemicModel>(Model, Model);
+        return new AggregateResultException<ICategory, ICategoryAnemicModel>(
+            data, new FailedSpecification<ICategory, ICategoryAnemicModel>(error));
+    }
 
     public AggregateResult<ICategory, ICategoryAnemicModel> CreateCategory(
         string name,
@@ -20,16 +38,16 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
     {
         var depthValidator = new MaxDepthValidator();
         if (!depthValidator.IsSatisfiedBy(depth))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category depth must not exceed 4.");
+            return Fail("Category depth must not exceed 4.");
 
         var uniqueNameValidator = new UniqueNameAmongSiblingsValidator(siblingNames);
         if (!uniqueNameValidator.IsSatisfiedBy(name))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category name must be unique among siblings.");
+            return Fail("Category name must be unique among siblings.");
 
         var root = CategoryRoot.CreateInstance(name, parentId, depth, sortOrder);
         var anemic = new AnemicModel { Root = root };
 
-        return AggregateResult<ICategory, ICategoryAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICategory, ICategoryAnemicModel> UpdateCategory(
@@ -39,11 +57,11 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
     {
         var activeValidator = new IsActiveValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Only active categories can be updated.");
+            return Fail("Only active categories can be updated.");
 
         var uniqueNameValidator = new UniqueNameAmongSiblingsValidator(siblingNames);
         if (!uniqueNameValidator.IsSatisfiedBy(name))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category name must be unique among siblings.");
+            return Fail("Category name must be unique among siblings.");
 
         var root = CategoryRoot.CreateInstance(
             name,
@@ -53,7 +71,7 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
             Model.Root.Status);
 
         var anemic = new AnemicModel { Root = root };
-        return AggregateResult<ICategory, ICategoryAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICategory, ICategoryAnemicModel> MoveCategory(
@@ -65,19 +83,19 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
     {
         var activeValidator = new IsActiveValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Only active categories can be moved.");
+            return Fail("Only active categories can be moved.");
 
         var depthValidator = new MaxDepthValidator();
         if (!depthValidator.IsSatisfiedBy(newDepth))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category depth must not exceed 4.");
+            return Fail("Category depth must not exceed 4.");
 
         var uniqueNameValidator = new UniqueNameAmongSiblingsValidator(newSiblingNames);
         if (!uniqueNameValidator.IsSatisfiedBy(Model.Root.Name))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category name must be unique among siblings at the target location.");
+            return Fail("Category name must be unique among siblings at the target location.");
 
         var noCycleValidator = new NoCycleValidator(ancestorIds);
         if (!noCycleValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Moving would create a cycle in the category hierarchy.");
+            return Fail("Moving would create a cycle in the category hierarchy.");
 
         var root = CategoryRoot.CreateInstance(
             Model.Root.Name,
@@ -87,7 +105,7 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
             Model.Root.Status);
 
         var anemic = new AnemicModel { Root = root };
-        return AggregateResult<ICategory, ICategoryAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICategory, ICategoryAnemicModel> DeactivateCategory(
@@ -95,11 +113,11 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
     {
         var activeValidator = new IsActiveValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category is already inactive.");
+            return Fail("Category is already inactive.");
 
         var noActiveChildrenValidator = new NoActiveChildrenValidator();
         if (!noActiveChildrenValidator.IsSatisfiedBy(hasActiveChildren))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Cannot deactivate a category with active children.");
+            return Fail("Cannot deactivate a category with active children.");
 
         var root = CategoryRoot.CreateInstance(
             Model.Root.Name,
@@ -109,14 +127,14 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
             "Inactive");
 
         var anemic = new AnemicModel { Root = root };
-        return AggregateResult<ICategory, ICategoryAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<ICategory, ICategoryAnemicModel> ActivateCategory()
     {
         var inactiveValidator = new IsInactiveValidator();
         if (!inactiveValidator.IsSatisfiedBy(Model))
-            return AggregateResult<ICategory, ICategoryAnemicModel>.Fail("Category is already active.");
+            return Fail("Category is already active.");
 
         var root = CategoryRoot.CreateInstance(
             Model.Root.Name,
@@ -126,6 +144,6 @@ internal sealed class Aggregate : Aggregate<ICategory, ICategoryAnemicModel>
             "Active");
 
         var anemic = new AnemicModel { Root = root };
-        return AggregateResult<ICategory, ICategoryAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

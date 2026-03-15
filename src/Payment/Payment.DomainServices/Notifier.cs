@@ -1,12 +1,17 @@
 namespace Payment.DomainServices;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using Payment.Domain;
 using Payment.Domain.Abstraction;
 using Payment.Domain.Implementation;
 
-public sealed class Notifier : IObservable<AggregateResult<IPayment, IPaymentAnemicModel>>
+public sealed class Notifier : INotifier<IPayment>, IObservable<AggregateResult<IPayment, IPaymentAnemicModel>>
 {
     private readonly List<IObserver<AggregateResult<IPayment, IPaymentAnemicModel>>> _observers = new();
     private Aggregate _aggregate;
@@ -65,6 +70,10 @@ public sealed class Notifier : IObservable<AggregateResult<IPayment, IPaymentAne
         var result = _aggregate.CapturePayment(providerTransactionId);
         Notify(result);
         return result;
+    }
+
+    void INotifier<IPayment>.Notify<TModel>(AggregateResult<IPayment, TModel> result)
+    {
     }
 
     private void Notify(AggregateResult<IPayment, IPaymentAnemicModel> result)

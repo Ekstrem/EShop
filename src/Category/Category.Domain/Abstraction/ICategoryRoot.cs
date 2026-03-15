@@ -1,8 +1,8 @@
 namespace Category.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface ICategoryRoot : IAggregateRoot<ICategory>
+public interface ICategoryRoot : IValueObject
 {
     string Name { get; }
     Guid? ParentId { get; }

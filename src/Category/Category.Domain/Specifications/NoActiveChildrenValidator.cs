@@ -1,10 +1,8 @@
 namespace Category.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
-
-internal sealed class NoActiveChildrenValidator : IBusinessOperationValidator<bool>
+internal sealed class NoActiveChildrenValidator
 {
     public bool IsSatisfiedBy(bool hasActiveChildren) => !hasActiveChildren;
 
-    public string ErrorMessage => "Cannot deactivate a category with active children.";
+    public string Reason => "Cannot deactivate a category with active children.";
 }

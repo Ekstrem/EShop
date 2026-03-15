@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -253,6 +253,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscountCode.Api", "src\DiscountCode\DiscountCode.Api\DiscountCode.Api.csproj", "{337A854A-941C-96A7-3304-7C498A26E6FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscountCode.Domain.Tests", "src\DiscountCode\DiscountCode.Domain.Tests\DiscountCode.Domain.Tests.csproj", "{87A3ED00-010C-95B8-6A73-96E5F95A2C74}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4BD5FA8B-C980-473A-92FF-D30E9E3214E2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{E5DE77C7-99F3-42AF-A00D-ECD8518FEA7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EShop.Contracts", "src\Shared\EShop.Contracts\EShop.Contracts.csproj", "{489D4269-8023-46E5-818D-C1CA2CF50C4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -736,6 +742,10 @@ Global
 		{87A3ED00-010C-95B8-6A73-96E5F95A2C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87A3ED00-010C-95B8-6A73-96E5F95A2C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87A3ED00-010C-95B8-6A73-96E5F95A2C74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{489D4269-8023-46E5-818D-C1CA2CF50C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{489D4269-8023-46E5-818D-C1CA2CF50C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{489D4269-8023-46E5-818D-C1CA2CF50C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{489D4269-8023-46E5-818D-C1CA2CF50C4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0C923346-00AD-902D-C2D9-6CAB86A40F3F} = {2CAC3DCB-61A2-606F-E523-436F6D29EB15}
@@ -857,5 +867,7 @@ Global
 		{EF196F57-DF9A-0BAA-585D-F0E74390A2A0} = {EC448EF0-0BA3-8DD2-A73F-C8B7AA9369BE}
 		{337A854A-941C-96A7-3304-7C498A26E6FB} = {EC448EF0-0BA3-8DD2-A73F-C8B7AA9369BE}
 		{87A3ED00-010C-95B8-6A73-96E5F95A2C74} = {EC448EF0-0BA3-8DD2-A73F-C8B7AA9369BE}
+		{E5DE77C7-99F3-42AF-A00D-ECD8518FEA7B} = {4BD5FA8B-C980-473A-92FF-D30E9E3214E2}
+		{489D4269-8023-46E5-818D-C1CA2CF50C4D} = {E5DE77C7-99F3-42AF-A00D-ECD8518FEA7B}
 	EndGlobalSection
 EndGlobal

@@ -1,18 +1,21 @@
 namespace Product.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using EShop.Contracts;
 using Product.Domain;
 using Product.Domain.Abstraction;
 using Product.Domain.Implementation;
+using Product.DomainServices;
 
 public sealed class CreateProductHandler
     : IRequestHandler<CreateProductCommand, AggregateResult<IProduct, IProductAnemicModel>>
 {
-    private readonly IAggregateProvider<IProduct, IProductAnemicModel> _provider;
+    private readonly AggregateProvider _provider;
 
-    public CreateProductHandler(IAggregateProvider<IProduct, IProductAnemicModel> provider)
+    public CreateProductHandler(AggregateProvider provider)
     {
         _provider = provider;
     }

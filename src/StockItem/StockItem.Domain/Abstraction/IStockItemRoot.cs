@@ -1,8 +1,8 @@
 namespace StockItem.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IStockItemRoot : IAggregateRoot<IStockItem>
+public interface IStockItemRoot : IValueObject
 {
     Guid VariantId { get; }
     Guid WarehouseId { get; }

@@ -1,15 +1,33 @@
 namespace Notification.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Notification.Domain.Abstraction;
 using Notification.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<INotification, INotificationAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(INotificationAnemicModel model) : base(model) { }
+    public INotificationAnemicModel Model { get; }
+
+    private Aggregate(INotificationAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(INotificationAnemicModel model) => new(model);
+
+    private AggregateResult<INotification, INotificationAnemicModel> Success(INotificationAnemicModel newModel)
+    {
+        var data = BusinessOperationData<INotification, INotificationAnemicModel>
+            .Commit<INotification, INotificationAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<INotification, INotificationAnemicModel>(data);
+    }
+
+    private AggregateResult<INotification, INotificationAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<INotification, INotificationAnemicModel>
+            .Commit<INotification, INotificationAnemicModel>(Model, Model);
+        return new AggregateResultException<INotification, INotificationAnemicModel>(
+            data, new FailedSpecification<INotification, INotificationAnemicModel>(error));
+    }
 
     public AggregateResult<INotification, INotificationAnemicModel> CreateNotification(
         Guid customerId,
@@ -31,15 +49,13 @@ internal sealed class Aggregate : Aggregate<INotification, INotificationAnemicMo
 
         var dedup = new DeduplicationValidator();
         if (!dedup.IsSatisfiedBy(anemic))
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Notification for this eventId and customerId already exists.");
+            return Fail("Notification for this eventId and customerId already exists.");
 
         var templateValidator = new TemplateExistsValidator();
         if (!templateValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Template does not exist.");
+            return Fail("Template does not exist.");
 
-        return AggregateResult<INotification, INotificationAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<INotification, INotificationAnemicModel> Render(
@@ -48,8 +64,7 @@ internal sealed class Aggregate : Aggregate<INotification, INotificationAnemicMo
     {
         var validator = new IsCreatedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Only notifications in Created status can be rendered.");
+            return Fail("Only notifications in Created status can be rendered.");
 
         var root = NotificationRoot.CreateInstance(
             Model.Root.CustomerId,
@@ -69,20 +84,18 @@ internal sealed class Aggregate : Aggregate<INotification, INotificationAnemicMo
             Subject = subject
         };
 
-        return AggregateResult<INotification, INotificationAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<INotification, INotificationAnemicModel> Send(bool hasConsent)
     {
         var validator = new IsRenderedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Only notifications in Rendered status can be sent.");
+            return Fail("Only notifications in Rendered status can be sent.");
 
         var consentValidator = new ConsentValidator();
         if (Model.Root.Type == "Marketing" && !hasConsent)
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Marketing notifications require customer consent.");
+            return Fail("Marketing notifications require customer consent.");
 
         var root = NotificationRoot.CreateInstance(
             Model.Root.CustomerId,
@@ -102,19 +115,17 @@ internal sealed class Aggregate : Aggregate<INotification, INotificationAnemicMo
             Subject = Model.Subject
         };
 
-        return AggregateResult<INotification, INotificationAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<INotification, INotificationAnemicModel> Retry()
     {
         var maxRetry = new MaxRetryValidator();
         if (!maxRetry.IsSatisfiedBy(Model))
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Maximum retry count (3) exceeded.");
+            return Fail("Maximum retry count (3) exceeded.");
 
         if (Model.Root.Status != "Failed")
-            return AggregateResult<INotification, INotificationAnemicModel>.Fail(
-                "Only failed notifications can be retried.");
+            return Fail("Only failed notifications can be retried.");
 
         var root = NotificationRoot.CreateInstance(
             Model.Root.CustomerId,
@@ -134,6 +145,6 @@ internal sealed class Aggregate : Aggregate<INotification, INotificationAnemicMo
             Subject = string.Empty
         };
 
-        return AggregateResult<INotification, INotificationAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

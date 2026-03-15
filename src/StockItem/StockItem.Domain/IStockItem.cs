@@ -1,11 +1,5 @@
 namespace StockItem.Domain;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
 
 public interface IStockItem : IBoundedContext { }
-
-public class StockItemBoundedContextDescription : IBoundedContextDescription
-{
-    public string ContextName => "StockItem";
-    public int MicroserviceVersion => 1;
-}

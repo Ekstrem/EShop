@@ -1,17 +1,13 @@
 namespace Order.DomainServices;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using Order.Domain;
 using Order.Domain.Abstraction;
 
 public class BusAdapter : IObserver<AggregateResult<IOrder, IOrderAnemicModel>>
 {
-    private readonly IEventBus _eventBus;
-
-    public BusAdapter(IEventBus eventBus)
-    {
-        _eventBus = eventBus;
-    }
+    public BusAdapter() { }
 
     public void OnCompleted() { }
 
@@ -19,5 +15,7 @@ public class BusAdapter : IObserver<AggregateResult<IOrder, IOrderAnemicModel>>
         => throw error;
 
     public void OnNext(AggregateResult<IOrder, IOrderAnemicModel> value)
-        => _eventBus.Publish(value);
+    {
+        // Publish domain events to event bus (stub).
+    }
 }

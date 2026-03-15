@@ -1,12 +1,11 @@
-using Hive.SeedWorks.TacticalPatterns;
-using Session.Domain.Abstraction;
-
 namespace Session.Domain.Specifications;
+
+using Session.Domain.Abstraction;
 
 /// <summary>
 /// Validates that a customer does not exceed the maximum of 5 active sessions.
 /// </summary>
-public sealed class MaxSessionsValidator : IBusinessOperationValidator<ISession, ISessionAnemicModel>
+public sealed class MaxSessionsValidator
 {
     private const int MaxActiveSessions = 5;
     private readonly int _currentActiveSessionCount;
@@ -26,5 +25,5 @@ public sealed class MaxSessionsValidator : IBusinessOperationValidator<ISession,
         return _currentActiveSessionCount < MaxActiveSessions;
     }
 
-    public string ErrorMessage => $"Customer cannot have more than {MaxActiveSessions} active sessions.";
+    public string Reason => $"Customer cannot have more than {MaxActiveSessions} active sessions.";
 }

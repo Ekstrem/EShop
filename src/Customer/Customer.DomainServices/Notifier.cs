@@ -1,13 +1,19 @@
 using Customer.Domain;
 using Customer.Domain.Abstraction;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Events;
+using EShop.Contracts;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 
 namespace Customer.DomainServices;
 
 /// <summary>
 /// Decorator that notifies observers after aggregate operations complete.
 /// </summary>
-public sealed class Notifier
+public sealed class Notifier : INotifier<ICustomer>
 {
     private readonly AggregateProvider _provider;
     private readonly IObserver<AggregateResult<ICustomer, ICustomerAnemicModel>> _observer;
@@ -18,6 +24,11 @@ public sealed class Notifier
     {
         _provider = provider;
         _observer = observer;
+    }
+
+    public void Notify<TModel>(AggregateResult<ICustomer, TModel> result)
+        where TModel : IAnemicModel<ICustomer>
+    {
     }
 
     public async Task HandleAsync(

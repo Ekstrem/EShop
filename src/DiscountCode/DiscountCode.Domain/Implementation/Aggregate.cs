@@ -1,15 +1,33 @@
 namespace DiscountCode.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using DiscountCode.Domain.Abstraction;
 using DiscountCode.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<IDiscountCode, IDiscountCodeAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(IDiscountCodeAnemicModel model) : base(model) { }
+    public IDiscountCodeAnemicModel Model { get; }
+
+    private Aggregate(IDiscountCodeAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(IDiscountCodeAnemicModel model) => new(model);
+
+    private AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> Success(IDiscountCodeAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IDiscountCode, IDiscountCodeAnemicModel>
+            .Commit<IDiscountCode, IDiscountCodeAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IDiscountCode, IDiscountCodeAnemicModel>(data);
+    }
+
+    private AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IDiscountCode, IDiscountCodeAnemicModel>
+            .Commit<IDiscountCode, IDiscountCodeAnemicModel>(Model, Model);
+        return new AggregateResultException<IDiscountCode, IDiscountCodeAnemicModel>(
+            data, new FailedSpecification<IDiscountCode, IDiscountCodeAnemicModel>(error));
+    }
 
     public AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> GenerateDiscountCode(
         string code,
@@ -26,53 +44,45 @@ internal sealed class Aggregate : Aggregate<IDiscountCode, IDiscountCodeAnemicMo
 
         var formatValidator = new CodeFormatValidator();
         if (!formatValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Code must be 6-20 characters, uppercase alphanumeric only.");
+            return Fail("Code must be 6-20 characters, uppercase alphanumeric only.");
 
         var uniqueValidator = new CodeUniqueValidator();
         if (!uniqueValidator.IsSatisfiedBy(anemic))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Code must be unique.");
+            return Fail("Code must be unique.");
 
-        return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> ValidateDiscountCode()
     {
         var activeValidator = new IsActiveCodeValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Discount code is not active.");
+            return Fail("Discount code is not active.");
 
         var usageValidator = new UsageLimitValidator();
         if (!usageValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Discount code usage limit has been reached.");
+            return Fail("Discount code usage limit has been reached.");
 
         var expiredValidator = new NotExpiredValidator();
         if (!expiredValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Discount code has expired.");
+            return Fail("Discount code has expired.");
 
-        return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Ok(Model);
+        return Success(Model);
     }
 
     public AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> RedeemDiscountCode(Guid orderId)
     {
         var activeValidator = new IsActiveCodeValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Discount code is not active.");
+            return Fail("Discount code is not active.");
 
         var usageValidator = new UsageLimitValidator();
         if (!usageValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Discount code usage limit has been reached.");
+            return Fail("Discount code usage limit has been reached.");
 
         var expiredValidator = new NotExpiredValidator();
         if (!expiredValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Discount code has expired.");
+            return Fail("Discount code has expired.");
 
         var newUsageCount = Model.Root.UsageCount + 1;
         var newStatus = newUsageCount >= Model.Root.MaxUsage ? "Exhausted" : Model.Root.Status;
@@ -95,15 +105,14 @@ internal sealed class Aggregate : Aggregate<IDiscountCode, IDiscountCodeAnemicMo
             Redemptions = redemptions
         };
 
-        return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> CompensateRedemption(Guid orderId)
     {
         var redemption = Model.Redemptions.FirstOrDefault(r => r.OrderId == orderId);
         if (redemption is null)
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                $"Redemption for order '{orderId}' not found.");
+            return Fail($"Redemption for order '{orderId}' not found.");
 
         var newUsageCount = Model.Root.UsageCount - 1;
         var newStatus = Model.Root.Status == "Exhausted" ? "Active" : Model.Root.Status;
@@ -125,15 +134,14 @@ internal sealed class Aggregate : Aggregate<IDiscountCode, IDiscountCodeAnemicMo
             Redemptions = redemptions
         };
 
-        return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IDiscountCode, IDiscountCodeAnemicModel> DeactivateCode()
     {
         var activeValidator = new IsActiveCodeValidator();
         if (!activeValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Fail(
-                "Only active codes can be deactivated.");
+            return Fail("Only active codes can be deactivated.");
 
         var root = DiscountCodeRoot.CreateInstance(
             Model.Root.Code,
@@ -150,6 +158,6 @@ internal sealed class Aggregate : Aggregate<IDiscountCode, IDiscountCodeAnemicMo
             Redemptions = Model.Redemptions.ToList()
         };
 
-        return AggregateResult<IDiscountCode, IDiscountCodeAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

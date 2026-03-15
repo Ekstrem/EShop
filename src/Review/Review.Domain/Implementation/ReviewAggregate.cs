@@ -1,7 +1,8 @@
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Review.Domain.Abstraction;
 using Review.Domain.Specifications;
+using EShop.Contracts;
 
 namespace Review.Domain.Implementation;
 
@@ -9,11 +10,28 @@ namespace Review.Domain.Implementation;
 /// Review aggregate containing all business operations.
 /// Each method returns an AggregateResult for event-driven processing.
 /// </summary>
-public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
+public sealed class ReviewAggregate
 {
-    private ReviewAggregate(IReviewAnemicModel model) : base(model) { }
+    public IReviewAnemicModel Model { get; }
+
+    private ReviewAggregate(IReviewAnemicModel model) => Model = model;
 
     public static ReviewAggregate CreateInstance(IReviewAnemicModel model) => new(model);
+
+    private AggregateResult<IReview, IReviewAnemicModel> Success(IReviewAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IReview, IReviewAnemicModel>
+            .Commit<IReview, IReviewAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IReview, IReviewAnemicModel>(data);
+    }
+
+    private AggregateResult<IReview, IReviewAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IReview, IReviewAnemicModel>
+            .Commit<IReview, IReviewAnemicModel>(Model, Model);
+        return new AggregateResultException<IReview, IReviewAnemicModel>(
+            data, new FailedSpecification<IReview, IReviewAnemicModel>(error));
+    }
 
     /// <summary>
     /// Submits a new review. Validates uniqueness per customer+product, rating range, and text length.
@@ -39,17 +57,17 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
         };
 
         if (!uniqueValidator.IsSatisfiedBy(tempModel))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(uniqueValidator.ErrorMessage);
+            return Fail(uniqueValidator.Reason);
 
         var ratingValidator = new RatingRangeValidator();
         if (!ratingValidator.IsSatisfiedBy(tempModel))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(ratingValidator.ErrorMessage);
+            return Fail(ratingValidator.Reason);
 
         var textValidator = new TextLengthValidator();
         if (!textValidator.IsSatisfiedBy(tempModel))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(textValidator.ErrorMessage);
+            return Fail(textValidator.Reason);
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(tempModel);
+        return Success(tempModel);
     }
 
     /// <summary>
@@ -63,11 +81,11 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var authorValidator = IsAuthorValidator.CreateInstance(requesterId);
         if (!authorValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(authorValidator.ErrorMessage);
+            return Fail(authorValidator.Reason);
 
         var publishedValidator = new IsPublishedValidator();
         if (!publishedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(publishedValidator.ErrorMessage);
+            return Fail(publishedValidator.Reason);
 
         var updatedRoot = ReviewRoot.CreateInstance(
             Model.Root.Id,
@@ -88,13 +106,13 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
 
         var ratingValidator = new RatingRangeValidator();
         if (!ratingValidator.IsSatisfiedBy(tempModel))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(ratingValidator.ErrorMessage);
+            return Fail(ratingValidator.Reason);
 
         var textValidator = new TextLengthValidator();
         if (!textValidator.IsSatisfiedBy(tempModel))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(textValidator.ErrorMessage);
+            return Fail(textValidator.Reason);
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(tempModel);
+        return Success(tempModel);
     }
 
     /// <summary>
@@ -104,7 +122,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var deletedValidator = new IsNotDeletedValidator();
         if (!deletedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(deletedValidator.ErrorMessage);
+            return Fail(deletedValidator.Reason);
 
         var updatedRoot = ReviewRoot.CreateInstance(
             Model.Root.Id,
@@ -125,7 +143,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
             Flags = Model.Flags.ToList()
         };
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     /// <summary>
@@ -135,7 +153,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var statusValidator = new IsSubmittedOrFlaggedValidator();
         if (!statusValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(statusValidator.ErrorMessage);
+            return Fail(statusValidator.Reason);
 
         var updatedRoot = ReviewRoot.CreateInstance(
             Model.Root.Id,
@@ -156,7 +174,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
             Flags = new List<IFlag>()
         };
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     /// <summary>
@@ -166,7 +184,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var statusValidator = new IsSubmittedOrFlaggedValidator();
         if (!statusValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(statusValidator.ErrorMessage);
+            return Fail(statusValidator.Reason);
 
         var updatedRoot = ReviewRoot.CreateInstance(
             Model.Root.Id,
@@ -187,7 +205,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
             Flags = Model.Flags.ToList()
         };
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     /// <summary>
@@ -197,11 +215,11 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var publishedValidator = new IsPublishedValidator();
         if (!publishedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(publishedValidator.ErrorMessage);
+            return Fail(publishedValidator.Reason);
 
         var notOwnValidator = IsNotOwnReviewValidator.CreateInstance(flaggerId);
         if (!notOwnValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(notOwnValidator.ErrorMessage);
+            return Fail(notOwnValidator.Reason);
 
         var newFlag = Flag.CreateInstance(flaggerId, reason, DateTime.UtcNow);
         var flags = Model.Flags.ToList();
@@ -228,7 +246,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
             Flags = flags
         };
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     /// <summary>
@@ -238,14 +256,14 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var publishedValidator = new IsPublishedValidator();
         if (!publishedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(publishedValidator.ErrorMessage);
+            return Fail(publishedValidator.Reason);
 
         var notOwnValidator = IsNotOwnReviewValidator.CreateInstance(voterId);
         if (!notOwnValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(notOwnValidator.ErrorMessage);
+            return Fail(notOwnValidator.Reason);
 
         if (Model.HelpfulVotes.Any(v => v.VoterId == voterId))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail("User has already voted on this review.");
+            return Fail("User has already voted on this review.");
 
         var vote = HelpfulVote.CreateInstance(voterId, DateTime.UtcNow);
         var votes = Model.HelpfulVotes.ToList();
@@ -258,7 +276,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
             Flags = Model.Flags.ToList()
         };
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     /// <summary>
@@ -268,7 +286,7 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
     {
         var publishedValidator = new IsPublishedValidator();
         if (!publishedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IReview, IReviewAnemicModel>.Fail(publishedValidator.ErrorMessage);
+            return Fail(publishedValidator.Reason);
 
         var updatedRoot = ReviewRoot.CreateInstance(
             Model.Root.Id,
@@ -289,6 +307,6 @@ public sealed class ReviewAggregate : Aggregate<IReview, IReviewAnemicModel>
             Flags = Model.Flags.ToList()
         };
 
-        return AggregateResult<IReview, IReviewAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

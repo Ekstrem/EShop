@@ -1,4 +1,3 @@
-using Hive.SeedWorks.TacticalPatterns;
 using Shipment.Domain.Abstraction;
 
 namespace Shipment.Domain.Specifications;
@@ -6,10 +5,10 @@ namespace Shipment.Domain.Specifications;
 /// <summary>
 /// Validates that the shipment has a shipping label.
 /// </summary>
-public sealed class HasLabelValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
+internal sealed class HasLabelValidator
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Label is not null && !string.IsNullOrWhiteSpace(model.Label.LabelUrl);
 
-    public string ErrorMessage => "Shipment must have a shipping label.";
+    public string Reason => "Shipment must have a shipping label.";
 }

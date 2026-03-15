@@ -1,16 +1,13 @@
-using Hive.SeedWorks.TacticalPatterns;
-using Session.Domain.Abstraction;
-
 namespace Session.Domain.Specifications;
+
+using Session.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the session has not expired.
 /// </summary>
-public sealed class SessionNotExpiredValidator : IBusinessOperationValidator<ISession, ISessionAnemicModel>
+public sealed class SessionNotExpiredValidator
 {
-    private SessionNotExpiredValidator()
-    {
-    }
+    private SessionNotExpiredValidator() { }
 
     public static SessionNotExpiredValidator CreateInstance()
     {
@@ -22,5 +19,5 @@ public sealed class SessionNotExpiredValidator : IBusinessOperationValidator<ISe
         return model.Root.ExpiresAt > DateTime.UtcNow;
     }
 
-    public string ErrorMessage => "Session has expired.";
+    public string Reason => "Session has expired.";
 }

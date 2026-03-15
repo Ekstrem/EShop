@@ -1,6 +1,10 @@
 namespace Cart.Application.Handlers;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 using Cart.Domain.Aggregate;
@@ -31,15 +35,15 @@ public class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, AggregateRes
 
         var activeValidator = new IsActiveCartValidator();
         if (!activeValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         var hasItemsValidator = new HasItemsForCheckoutValidator();
         if (!hasItemsValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(hasItemsValidator.ErrorMessage);
+            throw new InvalidOperationException(hasItemsValidator.Reason);
 
         var hasAddressValidator = new HasShippingAddressValidator();
         if (!hasAddressValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(hasAddressValidator.ErrorMessage);
+            throw new InvalidOperationException(hasAddressValidator.Reason);
 
         var result = CartAggregate.PlaceOrder(model);
 

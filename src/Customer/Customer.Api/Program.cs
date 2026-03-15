@@ -5,7 +5,9 @@ using Customer.Domain.Abstraction;
 using Customer.DomainServices;
 using Customer.InternalContracts;
 using Customer.Storage;
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

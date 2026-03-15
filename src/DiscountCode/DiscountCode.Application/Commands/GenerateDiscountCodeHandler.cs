@@ -1,7 +1,8 @@
 namespace DiscountCode.Application.Commands;
 
 using MediatR;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using DiscountCode.Domain;
 using DiscountCode.Domain.Abstraction;
 using DiscountCode.Domain.Implementation;

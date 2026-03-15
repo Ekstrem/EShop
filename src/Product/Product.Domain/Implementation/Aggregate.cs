@@ -1,15 +1,33 @@
 namespace Product.Domain.Implementation;
 
-using Hive.SeedWorks.TacticalPatterns;
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Result;
 using Product.Domain.Abstraction;
 using Product.Domain.Specifications;
+using EShop.Contracts;
 
-internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
+internal sealed class Aggregate
 {
-    private Aggregate(IProductAnemicModel model) : base(model) { }
+    public IProductAnemicModel Model { get; }
+
+    private Aggregate(IProductAnemicModel model) => Model = model;
 
     public static Aggregate CreateInstance(IProductAnemicModel model) => new(model);
+
+    private AggregateResult<IProduct, IProductAnemicModel> Success(IProductAnemicModel newModel)
+    {
+        var data = BusinessOperationData<IProduct, IProductAnemicModel>
+            .Commit<IProduct, IProductAnemicModel>(Model, newModel);
+        return new AggregateResultSuccess<IProduct, IProductAnemicModel>(data);
+    }
+
+    private AggregateResult<IProduct, IProductAnemicModel> Fail(string error)
+    {
+        var data = BusinessOperationData<IProduct, IProductAnemicModel>
+            .Commit<IProduct, IProductAnemicModel>(Model, Model);
+        return new AggregateResultException<IProduct, IProductAnemicModel>(
+            data, new FailedSpecification<IProduct, IProductAnemicModel>(error));
+    }
 
     public AggregateResult<IProduct, IProductAnemicModel> CreateProduct(
         string name,
@@ -26,8 +44,7 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = media.ToList()
         };
 
-        var aggregate = CreateInstance(anemic);
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(aggregate.Model);
+        return Success(anemic);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> UpdateProduct(
@@ -37,7 +54,7 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
     {
         var validator = new IsNotArchivedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Cannot update an archived product.");
+            return Fail("Cannot update an archived product.");
 
         var root = ProductRoot.CreateInstance(name, description, categoryId, Model.Root.Status);
         var anemic = new AnemicModel
@@ -47,14 +64,14 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = Model.Media.ToList()
         };
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> AddVariant(IProductVariant variant)
     {
         var validator = new IsNotArchivedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Cannot add variant to an archived product.");
+            return Fail("Cannot add variant to an archived product.");
 
         var variants = Model.Variants.ToList();
         variants.Add(variant);
@@ -67,24 +84,24 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
 
         var skuValidator = new UniqueSkuValidator();
         if (!skuValidator.IsSatisfiedBy(tempModel))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Variant SKU must be unique within the product.");
+            return Fail("Variant SKU must be unique within the product.");
 
         var priceValidator = new VariantHasPriceValidator();
         if (!priceValidator.IsSatisfiedBy(variant))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Variant price must be greater than zero.");
+            return Fail("Variant price must be greater than zero.");
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(tempModel);
+        return Success(tempModel);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> RemoveVariant(string sku)
     {
         var validator = new IsNotArchivedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Cannot remove variant from an archived product.");
+            return Fail("Cannot remove variant from an archived product.");
 
         var variants = Model.Variants.Where(v => v.Sku != sku).ToList();
         if (variants.Count == Model.Variants.Count)
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail($"Variant with SKU '{sku}' not found.");
+            return Fail($"Variant with SKU '{sku}' not found.");
 
         var anemic = new AnemicModel
         {
@@ -93,22 +110,22 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = Model.Media.ToList()
         };
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> UpdateVariantPrice(string sku, decimal newPrice)
     {
         var validator = new IsNotArchivedValidator();
         if (!validator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Cannot update variant price on an archived product.");
+            return Fail("Cannot update variant price on an archived product.");
 
         if (newPrice <= 0)
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Price must be greater than zero.");
+            return Fail("Price must be greater than zero.");
 
         var variants = Model.Variants.ToList();
         var existing = variants.FirstOrDefault(v => v.Sku == sku);
         if (existing is null)
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail($"Variant with SKU '{sku}' not found.");
+            return Fail($"Variant with SKU '{sku}' not found.");
 
         var updated = ProductVariant.CreateInstance(existing.Sku, existing.Size, existing.Color, newPrice);
         var updatedVariants = variants.Where(v => v.Sku != sku).Append(updated).ToList();
@@ -120,22 +137,22 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = Model.Media.ToList()
         };
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> PublishProduct()
     {
         var draftValidator = new IsDraftValidator();
         if (!draftValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Only draft products can be published.");
+            return Fail("Only draft products can be published.");
 
         var variantValidator = new HasAtLeastOneVariantValidator();
         if (!variantValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Product must have at least one variant to be published.");
+            return Fail("Product must have at least one variant to be published.");
 
         var imageValidator = new HasImageForPublishValidator();
         if (!imageValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Product must have at least one image to be published.");
+            return Fail("Product must have at least one image to be published.");
 
         var root = ProductRoot.CreateInstance(
             Model.Root.Name,
@@ -150,14 +167,14 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = Model.Media.ToList()
         };
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> ArchiveProduct()
     {
         var publishedValidator = new IsPublishedValidator();
         if (!publishedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Only published products can be archived.");
+            return Fail("Only published products can be archived.");
 
         var root = ProductRoot.CreateInstance(
             Model.Root.Name,
@@ -172,14 +189,14 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = Model.Media.ToList()
         };
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 
     public AggregateResult<IProduct, IProductAnemicModel> RestoreProduct()
     {
         var archivedValidator = new IsArchivedValidator();
         if (!archivedValidator.IsSatisfiedBy(Model))
-            return AggregateResult<IProduct, IProductAnemicModel>.Fail("Only archived products can be restored.");
+            return Fail("Only archived products can be restored.");
 
         var root = ProductRoot.CreateInstance(
             Model.Root.Name,
@@ -194,6 +211,6 @@ internal sealed class Aggregate : Aggregate<IProduct, IProductAnemicModel>
             Media = Model.Media.ToList()
         };
 
-        return AggregateResult<IProduct, IProductAnemicModel>.Ok(anemic);
+        return Success(anemic);
     }
 }

@@ -1,6 +1,10 @@
 namespace Cart.Application.Handlers;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 using Cart.Domain.Aggregate;
@@ -31,11 +35,11 @@ public class UpdateCartItemQuantityHandler : IRequestHandler<UpdateCartItemQuant
 
         var activeValidator = new IsActiveCartValidator();
         if (!activeValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         var quantityValidator = new QuantityRangeValidator(request.NewQuantity);
         if (!quantityValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(quantityValidator.ErrorMessage);
+            throw new InvalidOperationException(quantityValidator.Reason);
 
         var result = CartAggregate.UpdateCartItemQuantity(model, request.VariantId, request.NewQuantity);
 

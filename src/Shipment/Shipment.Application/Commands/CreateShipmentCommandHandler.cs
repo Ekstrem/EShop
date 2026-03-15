@@ -1,15 +1,13 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
-using Shipment.Domain.Specifications;
+using Shipment.Domain.Implementation;
 using Shipment.DomainServices;
 
 namespace Shipment.Application.Commands;
 
-/// <summary>
-/// Handles the CreateShipmentCommand.
-/// </summary>
 public sealed class CreateShipmentCommandHandler
     : IRequestHandler<CreateShipmentCommand, AggregateResult<IShipment, IShipmentAnemicModel>>
 {
@@ -26,16 +24,20 @@ public sealed class CreateShipmentCommandHandler
         CreateShipmentCommand request,
         CancellationToken cancellationToken)
     {
-        // Validate that items are provided.
-        var hasItemsValidator = new HasItemsValidator();
+        var aggregate = Aggregate.CreateInstance(new AnemicModel());
 
-        // Build aggregate result via domain logic.
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "CreateShipment",
-            $"Shipment created for order {request.OrderId}.");
+        var items = request.Items
+            .Select(i => ShipmentItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity))
+            .ToList<IShipmentItem>();
 
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        var result = aggregate.CreateShipment(
+            request.OrderId, request.Carrier, request.ShippingAddress, items);
+
+        if (result.IsSuccess())
+        {
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

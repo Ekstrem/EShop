@@ -1,11 +1,5 @@
 namespace Invoice.Domain;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
 
 public interface IInvoice : IBoundedContext { }
-
-public class InvoiceBoundedContextDescription : IBoundedContextDescription
-{
-    public string ContextName => "Invoice";
-    public int MicroserviceVersion => 1;
-}

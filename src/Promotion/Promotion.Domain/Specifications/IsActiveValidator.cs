@@ -1,12 +1,11 @@
 namespace Promotion.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Promotion.Domain.Abstraction;
 
-internal sealed class IsActiveValidator : IBusinessOperationValidator<IPromotionAnemicModel>
+internal sealed class IsActiveValidator
 {
     public bool IsSatisfiedBy(IPromotionAnemicModel model)
         => model.Root.Status == "Active";
 
-    public string ErrorMessage => "Promotion must be in Active status.";
+    public string Reason => "Promotion must be in Active status.";
 }

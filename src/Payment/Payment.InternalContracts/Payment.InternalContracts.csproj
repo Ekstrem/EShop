@@ -5,9 +5,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..$CTX.Domain$CTX.Domain.csproj" />
+    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.5.0" />
+    <ProjectReference Include="../../Shared/EShop.Contracts/EShop.Contracts.csproj" />
+    <ProjectReference Include="../Payment.Domain/Payment.Domain.csproj" />
   </ItemGroup>
 </Project>

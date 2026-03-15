@@ -1,15 +1,13 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
-using Shipment.Domain.Specifications;
+using Shipment.Domain.Implementation;
 using Shipment.DomainServices;
 
 namespace Shipment.Application.Commands;
 
-/// <summary>
-/// Handles the HandleCarrierUpdateCommand.
-/// </summary>
 public sealed class HandleCarrierUpdateCommandHandler
     : IRequestHandler<HandleCarrierUpdateCommand, AggregateResult<IShipment, IShipmentAnemicModel>>
 {
@@ -31,17 +29,16 @@ public sealed class HandleCarrierUpdateCommandHandler
         HandleCarrierUpdateCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ShipmentId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ShipmentId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model);
 
-        var isNotDeliveredValidator = new IsNotDeliveredValidator();
-        var sequentialValidator = new SequentialStatusValidator(request.NewStatus);
+        var result = aggregate.HandleCarrierUpdate(request.NewStatus);
 
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "HandleCarrierUpdate",
-            $"Shipment {request.ShipmentId} updated to {request.NewStatus}.");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        if (result.IsSuccess())
+        {
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

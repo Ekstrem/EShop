@@ -1,3 +1,4 @@
+using EShop.Contracts;
 using Review.Domain.Implementation;
 using Xunit;
 
@@ -38,7 +39,7 @@ public sealed class ReviewAggregateTests
             "This product exceeded all my expectations and works perfectly.",
             true, (_, _) => false);
 
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsSuccess());
     }
 
     [Fact]
@@ -50,7 +51,7 @@ public sealed class ReviewAggregateTests
             "This product exceeded all my expectations and works perfectly.",
             true, (_, _) => true);
 
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsSuccess());
     }
 
     [Theory]
@@ -65,7 +66,7 @@ public sealed class ReviewAggregateTests
             "This product is okay but I have some issues with it overall.",
             false, (_, _) => false);
 
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsSuccess());
     }
 
     [Fact]
@@ -77,7 +78,7 @@ public sealed class ReviewAggregateTests
             "Short",
             false, (_, _) => false);
 
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsSuccess());
     }
 
     [Fact]
@@ -90,7 +91,7 @@ public sealed class ReviewAggregateTests
             customerId, 3, "Updated Title",
             "Updated review text that meets the minimum length requirement.");
 
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsSuccess());
     }
 
     [Fact]
@@ -102,7 +103,7 @@ public sealed class ReviewAggregateTests
             Guid.NewGuid(), 3, "Updated Title",
             "Updated review text that meets the minimum length requirement.");
 
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsSuccess());
     }
 
     [Fact]
@@ -111,8 +112,8 @@ public sealed class ReviewAggregateTests
         var aggregate = CreatePublishedAggregate();
         var result = aggregate.DeleteReview(Guid.NewGuid());
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Deleted", result.Model.Root.Status);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Deleted", result.Model().Root.Status);
     }
 
     [Fact]
@@ -132,8 +133,8 @@ public sealed class ReviewAggregateTests
 
         var result = aggregate.ApproveReview();
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Published", result.Model.Root.Status);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Published", result.Model().Root.Status);
     }
 
     [Fact]
@@ -153,8 +154,8 @@ public sealed class ReviewAggregateTests
 
         var result = aggregate.RejectReview();
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Rejected", result.Model.Root.Status);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Rejected", result.Model().Root.Status);
     }
 
     [Fact]
@@ -165,8 +166,8 @@ public sealed class ReviewAggregateTests
 
         var result = aggregate.FlagReview(flaggerId, "Inappropriate content");
 
-        Assert.True(result.IsSuccess);
-        Assert.Single(result.Model.Flags);
+        Assert.True(result.IsSuccess());
+        Assert.Single(result.Model().Flags);
     }
 
     [Fact]
@@ -197,8 +198,8 @@ public sealed class ReviewAggregateTests
 
         var result = aggregateWithFlags.FlagReview(Guid.NewGuid(), "Offensive");
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Flagged", result.Model.Root.Status);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Flagged", result.Model().Root.Status);
     }
 
     [Fact]
@@ -209,8 +210,8 @@ public sealed class ReviewAggregateTests
 
         var result = aggregate.VoteHelpful(voterId);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal(1, result.Model.HelpfulCount);
+        Assert.True(result.IsSuccess());
+        Assert.Equal(1, result.Model().HelpfulCount);
     }
 
     [Fact]
@@ -221,7 +222,7 @@ public sealed class ReviewAggregateTests
 
         var result = aggregate.VoteHelpful(customerId);
 
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsSuccess());
     }
 
     [Fact]
@@ -231,7 +232,7 @@ public sealed class ReviewAggregateTests
 
         var result = aggregate.RespondToReview("Thank you for your feedback!");
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("Thank you for your feedback!", result.Model.Root.ModeratorResponse);
+        Assert.True(result.IsSuccess());
+        Assert.Equal("Thank you for your feedback!", result.Model().Root.ModeratorResponse);
     }
 }

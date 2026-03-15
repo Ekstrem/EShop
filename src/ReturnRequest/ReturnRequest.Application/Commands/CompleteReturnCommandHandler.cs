@@ -1,8 +1,9 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
-using ReturnRequest.Domain.Specifications;
+using ReturnRequest.Domain.Implementation;
 using ReturnRequest.DomainServices;
 
 namespace ReturnRequest.Application.Commands;
@@ -31,17 +32,16 @@ public sealed class CompleteReturnCommandHandler
         CompleteReturnCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model!);
 
-        var isReceivedValidator = new IsReceivedValidator();
-        var refundAmountValidator = new RefundAmountValidator();
+        var result = aggregate.CompleteReturn(request.RefundAmount);
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.CreateInstance(
-            "CompleteReturn",
-            $"Return request {request.ReturnRequestId} completed with refund {request.RefundAmount}.");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        if (result.IsSuccess())
+        {
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

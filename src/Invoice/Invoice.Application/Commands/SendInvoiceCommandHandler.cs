@@ -1,6 +1,7 @@
 namespace Invoice.Application.Commands;
 
-using Hive.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
 using MediatR;
 using Invoice.Domain;
 using Invoice.Domain.Abstraction;

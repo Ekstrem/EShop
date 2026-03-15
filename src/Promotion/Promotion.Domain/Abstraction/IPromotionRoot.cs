@@ -1,8 +1,8 @@
 namespace Promotion.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface IPromotionRoot : IAggregateRoot<IPromotion>
+public interface IPromotionRoot : IValueObject
 {
     string Name { get; }
     string Description { get; }

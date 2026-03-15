@@ -1,8 +1,8 @@
 namespace Cart.Domain.Abstraction;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 
-public interface ICartRoot : IAggregateRoot<ICart>
+public interface ICartRoot : IValueObject
 {
     Guid CustomerId { get; }
     Guid SessionId { get; }

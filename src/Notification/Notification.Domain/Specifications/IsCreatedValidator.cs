@@ -1,12 +1,11 @@
 namespace Notification.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Notification.Domain.Abstraction;
 
-internal sealed class IsCreatedValidator : IBusinessOperationValidator<INotificationAnemicModel>
+internal sealed class IsCreatedValidator
 {
     public bool IsSatisfiedBy(INotificationAnemicModel model)
         => model.Root.Status == "Created";
 
-    public string ErrorMessage => "Notification must be in Created status.";
+    public string Reason => "Notification must be in Created status.";
 }

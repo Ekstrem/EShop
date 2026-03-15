@@ -1,12 +1,11 @@
 namespace Payment.Domain.Specifications;
 
-using Hive.SeedWorks.TacticalPatterns;
 using Payment.Domain.Abstraction;
 
-internal sealed class IsInitiatedValidator : IBusinessOperationValidator<IPaymentAnemicModel>
+internal sealed class IsInitiatedValidator
 {
     public bool IsSatisfiedBy(IPaymentAnemicModel model)
         => model.Root.Status == "Initiated";
 
-    public string ErrorMessage => "Payment must be in Initiated status.";
+    public string Reason => "Payment must be in Initiated status.";
 }

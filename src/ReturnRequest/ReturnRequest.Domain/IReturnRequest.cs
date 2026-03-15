@@ -1,4 +1,4 @@
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Definition;
 
 namespace ReturnRequest.Domain;
 
@@ -7,15 +7,4 @@ namespace ReturnRequest.Domain;
 /// </summary>
 public interface IReturnRequest : IBoundedContext
 {
-}
-
-/// <summary>
-/// Describes the ReturnRequest bounded context.
-/// </summary>
-public sealed class ReturnRequestBoundedContextDescription : IBoundedContextDescription
-{
-    public string Name => "ReturnRequest";
-
-    public string Description =>
-        "Manages return requests, approvals, rejections, return shipping, receiving, and refund lifecycle.";
 }

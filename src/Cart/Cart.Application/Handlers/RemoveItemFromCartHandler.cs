@@ -1,6 +1,10 @@
 namespace Cart.Application.Handlers;
 
-using Hive.SeedWorks.TacticalPatterns;
+using DigiTFactory.Libraries.SeedWorks.Result;
+using DigiTFactory.Libraries.SeedWorks.Invariants;
+using DigiTFactory.Libraries.SeedWorks.Definition;
+using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
+using EShop.Contracts;
 using Cart.Domain;
 using Cart.Domain.Abstraction;
 using Cart.Domain.Aggregate;
@@ -31,7 +35,7 @@ public class RemoveItemFromCartHandler : IRequestHandler<RemoveItemFromCartComma
 
         var activeValidator = new IsActiveCartValidator();
         if (!activeValidator.IsSatisfiedBy(model))
-            throw new InvalidOperationException(activeValidator.ErrorMessage);
+            throw new InvalidOperationException(activeValidator.Reason);
 
         if (model.Items.All(i => i.VariantId != request.VariantId))
             throw new InvalidOperationException("Item not found in cart.");

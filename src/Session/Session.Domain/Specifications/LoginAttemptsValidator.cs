@@ -1,13 +1,12 @@
-using Hive.SeedWorks.TacticalPatterns;
-using Session.Domain.Abstraction;
-
 namespace Session.Domain.Specifications;
+
+using Session.Domain.Abstraction;
 
 /// <summary>
 /// Validates that the customer has not exceeded 5 failed login attempts
 /// within the last 15 minutes, blocking further attempts if so.
 /// </summary>
-public sealed class LoginAttemptsValidator : IBusinessOperationValidator<ISession, ISessionAnemicModel>
+public sealed class LoginAttemptsValidator
 {
     private const int MaxFailedAttempts = 5;
     private static readonly TimeSpan BlockDuration = TimeSpan.FromMinutes(15);
@@ -40,7 +39,7 @@ public sealed class LoginAttemptsValidator : IBusinessOperationValidator<ISessio
         return DateTime.UtcNow >= blockExpiresAt;
     }
 
-    public string ErrorMessage =>
+    public string Reason =>
         $"Account is temporarily blocked due to {MaxFailedAttempts} failed login attempts. " +
         $"Please try again after {BlockDuration.TotalMinutes} minutes.";
 }
