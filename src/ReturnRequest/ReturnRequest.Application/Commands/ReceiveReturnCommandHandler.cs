@@ -1,13 +1,9 @@
 using DigiTFactory.Libraries.SeedWorks.Result;
-using DigiTFactory.Libraries.SeedWorks.Invariants;
-using DigiTFactory.Libraries.SeedWorks.Definition;
-using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
 using ReturnRequest.Domain.Implementation;
-using ReturnRequest.Domain.Specifications;
 using ReturnRequest.DomainServices;
 
 namespace ReturnRequest.Application.Commands;
@@ -36,26 +32,16 @@ public sealed class ReceiveReturnCommandHandler
         ReceiveReturnCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model!);
 
-        var isReturnShippedValidator = new IsReturnShippedValidator();
+        var result = aggregate.ReceiveReturn();
 
-        var model = new AnemicModel
+        if (result.IsSuccess())
         {
-            Root = ReturnRequestRoot.CreateInstance(
-                id: request.ReturnRequestId,
-                orderId: Guid.Empty,
-                customerId: Guid.Empty,
-                rmaNumber: string.Empty,
-                reason: string.Empty,
-                status: "Received",
-                requestedAt: DateTime.UtcNow)
-        };
-
-        var result = AggregateResultExtensions.CreateResult<IReturnRequest, IReturnRequestAnemicModel>(model, "ReceiveReturn");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        _notifier.Notify(result);
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

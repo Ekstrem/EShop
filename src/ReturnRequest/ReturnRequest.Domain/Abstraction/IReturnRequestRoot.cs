@@ -7,6 +7,7 @@ namespace ReturnRequest.Domain.Abstraction;
 /// </summary>
 public interface IReturnRequestRoot : IValueObject
 {
+    Guid Id { get; }
     Guid OrderId { get; }
     Guid CustomerId { get; }
     string RmaNumber { get; }

@@ -1,20 +1,13 @@
 using DigiTFactory.Libraries.SeedWorks.Result;
-using DigiTFactory.Libraries.SeedWorks.Invariants;
-using DigiTFactory.Libraries.SeedWorks.Definition;
-using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 using EShop.Contracts;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
 using Shipment.Domain.Implementation;
-using Shipment.Domain.Specifications;
 using Shipment.DomainServices;
 
 namespace Shipment.Application.Commands;
 
-/// <summary>
-/// Handles the MarkAsPackedCommand.
-/// </summary>
 public sealed class MarkAsPackedCommandHandler
     : IRequestHandler<MarkAsPackedCommand, AggregateResult<IShipment, IShipmentAnemicModel>>
 {
@@ -36,27 +29,16 @@ public sealed class MarkAsPackedCommandHandler
         MarkAsPackedCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ShipmentId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ShipmentId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model);
 
-        var isPendingValidator = new IsPendingValidator();
-        var hasItemsValidator = new HasItemsValidator();
+        var result = aggregate.MarkAsPacked();
 
-        var model = new AnemicModel
+        if (result.IsSuccess())
         {
-            Root = ShipmentRoot.CreateInstance(
-                id: request.ShipmentId,
-                orderId: Guid.Empty,
-                trackingNumber: string.Empty,
-                carrier: string.Empty,
-                shippingAddress: string.Empty,
-                status: "Packed",
-                createdAt: DateTime.UtcNow)
-        };
-
-        var result = AggregateResultExtensions.CreateResult<IShipment, IShipmentAnemicModel>(model, "MarkAsPacked");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        _notifier.Notify(result);
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

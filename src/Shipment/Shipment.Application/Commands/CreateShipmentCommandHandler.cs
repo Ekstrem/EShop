@@ -1,20 +1,13 @@
 using DigiTFactory.Libraries.SeedWorks.Result;
-using DigiTFactory.Libraries.SeedWorks.Invariants;
-using DigiTFactory.Libraries.SeedWorks.Definition;
-using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 using EShop.Contracts;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
 using Shipment.Domain.Implementation;
-using Shipment.Domain.Specifications;
 using Shipment.DomainServices;
 
 namespace Shipment.Application.Commands;
 
-/// <summary>
-/// Handles the CreateShipmentCommand.
-/// </summary>
 public sealed class CreateShipmentCommandHandler
     : IRequestHandler<CreateShipmentCommand, AggregateResult<IShipment, IShipmentAnemicModel>>
 {
@@ -31,30 +24,20 @@ public sealed class CreateShipmentCommandHandler
         CreateShipmentCommand request,
         CancellationToken cancellationToken)
     {
-        // Validate that items are provided.
-        var hasItemsValidator = new HasItemsValidator();
+        var aggregate = Aggregate.CreateInstance(new AnemicModel());
 
-        // Build anemic model from command properties.
-        var model = new AnemicModel
+        var items = request.Items
+            .Select(i => ShipmentItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity))
+            .ToList<IShipmentItem>();
+
+        var result = aggregate.CreateShipment(
+            request.OrderId, request.Carrier, request.ShippingAddress, items);
+
+        if (result.IsSuccess())
         {
-            Root = ShipmentRoot.CreateInstance(
-                id: Guid.NewGuid(),
-                orderId: request.OrderId,
-                trackingNumber: string.Empty,
-                carrier: request.Carrier,
-                shippingAddress: request.ShippingAddress,
-                status: "Pending",
-                createdAt: DateTime.UtcNow),
-            Items = request.Items
-                .Select(i => ShipmentItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity))
-                .ToList<IShipmentItem>()
-        };
-
-        // Build aggregate result via domain logic.
-        var result = AggregateResultExtensions.CreateResult<IShipment, IShipmentAnemicModel>(model, "CreateShipment");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        _notifier.Notify(result);
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

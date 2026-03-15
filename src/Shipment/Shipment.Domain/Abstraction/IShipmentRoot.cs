@@ -7,6 +7,7 @@ namespace Shipment.Domain.Abstraction;
 /// </summary>
 public interface IShipmentRoot : IValueObject
 {
+    Guid Id { get; }
     Guid OrderId { get; }
     string TrackingNumber { get; }
     string Carrier { get; }

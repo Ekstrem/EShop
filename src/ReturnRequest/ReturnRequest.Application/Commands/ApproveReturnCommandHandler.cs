@@ -1,13 +1,9 @@
 using DigiTFactory.Libraries.SeedWorks.Result;
-using DigiTFactory.Libraries.SeedWorks.Invariants;
-using DigiTFactory.Libraries.SeedWorks.Definition;
-using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
 using ReturnRequest.Domain.Implementation;
-using ReturnRequest.Domain.Specifications;
 using ReturnRequest.DomainServices;
 
 namespace ReturnRequest.Application.Commands;
@@ -36,27 +32,16 @@ public sealed class ApproveReturnCommandHandler
         ApproveReturnCommand request,
         CancellationToken cancellationToken)
     {
-        var aggregate = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var model = await _aggregateProvider.GetByIdAsync(request.ReturnRequestId, cancellationToken);
+        var aggregate = Aggregate.CreateInstance(model!);
 
-        var isRequestedValidator = new IsRequestedValidator();
+        var result = aggregate.ApproveReturn(request.LabelUrl, request.Carrier);
 
-        var model = new AnemicModel
+        if (result.IsSuccess())
         {
-            Root = ReturnRequestRoot.CreateInstance(
-                id: request.ReturnRequestId,
-                orderId: Guid.Empty,
-                customerId: Guid.Empty,
-                rmaNumber: string.Empty,
-                reason: string.Empty,
-                status: "Approved",
-                requestedAt: DateTime.UtcNow),
-            ReturnLabel = ReturnLabel.CreateInstance(request.LabelUrl, request.Carrier)
-        };
-
-        var result = AggregateResultExtensions.CreateResult<IReturnRequest, IReturnRequestAnemicModel>(model, "ApproveReturn");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        _notifier.Notify(result);
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }

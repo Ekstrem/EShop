@@ -1,13 +1,9 @@
 using DigiTFactory.Libraries.SeedWorks.Result;
-using DigiTFactory.Libraries.SeedWorks.Invariants;
-using DigiTFactory.Libraries.SeedWorks.Definition;
-using DigiTFactory.Libraries.SeedWorks.TacticalPatterns;
 using EShop.Contracts;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
 using ReturnRequest.Domain.Implementation;
-using ReturnRequest.Domain.Specifications;
 using ReturnRequest.DomainServices;
 
 namespace ReturnRequest.Application.Commands;
@@ -31,28 +27,20 @@ public sealed class RequestReturnCommandHandler
         RequestReturnCommand request,
         CancellationToken cancellationToken)
     {
-        var hasReasonValidator = new HasReasonValidator();
-        var withinReturnPeriodValidator = new WithinReturnPeriodValidator(request.OrderDeliveredAt);
+        var aggregate = Aggregate.CreateInstance(new AnemicModel());
 
-        var model = new AnemicModel
+        var items = request.Items
+            .Select(i => ReturnItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity, i.UnitPrice))
+            .ToList<IReturnItem>();
+
+        var result = aggregate.RequestReturn(
+            request.OrderId, request.CustomerId, request.Reason, items, request.OrderDeliveredAt);
+
+        if (result.IsSuccess())
         {
-            Root = ReturnRequestRoot.CreateInstance(
-                id: Guid.NewGuid(),
-                orderId: request.OrderId,
-                customerId: request.CustomerId,
-                rmaNumber: $"RMA-{Guid.NewGuid():N}"[..12],
-                reason: request.Reason,
-                status: "Requested",
-                requestedAt: DateTime.UtcNow),
-            Items = request.Items
-                .Select(i => ReturnItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity, i.UnitPrice))
-                .ToList<IReturnItem>()
-        };
-
-        var result = AggregateResultExtensions.CreateResult<IReturnRequest, IReturnRequestAnemicModel>(model, "RequestReturn");
-
-        await _busAdapter.PublishAsync(result, cancellationToken);
-        _notifier.Notify(result);
+            await _busAdapter.PublishAsync(result, cancellationToken);
+            _notifier.Notify(result);
+        }
 
         return result;
     }
