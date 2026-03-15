@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
+using Shipment.Domain.Implementation;
 using Shipment.Domain.Specifications;
 using Shipment.DomainServices;
 
@@ -36,12 +38,22 @@ public sealed class MarkAsPackedCommandHandler
         var isPendingValidator = new IsPendingValidator();
         var hasItemsValidator = new HasItemsValidator();
 
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "MarkAsPacked",
-            $"Shipment {request.ShipmentId} marked as packed.");
+        var model = new AnemicModel
+        {
+            Root = ShipmentRoot.CreateInstance(
+                id: request.ShipmentId,
+                orderId: Guid.Empty,
+                trackingNumber: string.Empty,
+                carrier: string.Empty,
+                shippingAddress: string.Empty,
+                status: "Packed",
+                createdAt: DateTime.UtcNow)
+        };
+
+        var result = AggregateResult<IShipment, IShipmentAnemicModel>.Create(model, "MarkAsPacked");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

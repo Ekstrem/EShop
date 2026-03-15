@@ -8,7 +8,7 @@ namespace Shipment.Domain.Specifications;
 /// </summary>
 public sealed class HasItemsValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Items.Count >= 1;
 
     public string ErrorMessage => "Shipment must contain at least one item.";

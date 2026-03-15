@@ -8,7 +8,7 @@ namespace ReturnRequest.Domain.Specifications;
 /// </summary>
 public sealed class HasReasonValidator : IBusinessOperationValidator<IReturnRequest, IReturnRequestAnemicModel>
 {
-    public bool IsValid(IReturnRequestAnemicModel model)
+    public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
         => !string.IsNullOrWhiteSpace(model.Root.Reason);
 
     public string ErrorMessage => "Return request must have a reason.";

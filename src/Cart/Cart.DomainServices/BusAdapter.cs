@@ -1,5 +1,7 @@
+using Hive.SeedWorks.Events;
 namespace Cart.DomainServices;
 
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Cart.Domain;
 using Cart.Domain.Abstraction;

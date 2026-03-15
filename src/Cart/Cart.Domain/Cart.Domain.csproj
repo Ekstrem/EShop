@@ -5,6 +5,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
+    <InternalsVisibleTo Include="Cart.DomainServices" />
+    <InternalsVisibleTo Include="Cart.Domain.Tests" />
+    <InternalsVisibleTo Include="EShop.IntegrationTests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
   </ItemGroup>
 </Project>

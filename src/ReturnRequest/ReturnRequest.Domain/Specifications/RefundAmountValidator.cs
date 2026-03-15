@@ -8,7 +8,7 @@ namespace ReturnRequest.Domain.Specifications;
 /// </summary>
 public sealed class RefundAmountValidator : IBusinessOperationValidator<IReturnRequest, IReturnRequestAnemicModel>
 {
-    public bool IsValid(IReturnRequestAnemicModel model)
+    public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
     {
         var totalItemsCost = model.Items.Sum(item => item.Quantity * item.UnitPrice);
         return model.RefundAmount >= 0 && model.RefundAmount <= totalItemsCost;

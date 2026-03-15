@@ -14,8 +14,6 @@ public interface IShipment : IBoundedContext
 /// </summary>
 public sealed class ShipmentBoundedContextDescription : IBoundedContextDescription
 {
-    public string Name => "Shipment";
-
-    public string Description =>
-        "Manages shipment creation, packing, dispatching, carrier tracking, and delivery lifecycle.";
+    public string ContextName => "Shipment";
+    public int MicroserviceVersion => 1;
 }

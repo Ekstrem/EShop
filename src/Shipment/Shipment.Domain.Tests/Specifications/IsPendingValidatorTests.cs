@@ -11,7 +11,7 @@ public sealed class IsPendingValidatorTests
     public void IsValid_WhenStatusIsPending_ReturnsTrue()
     {
         var model = TestAnemicModelBuilder.Build(status: "Pending");
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Theory]
@@ -22,6 +22,6 @@ public sealed class IsPendingValidatorTests
     public void IsValid_WhenStatusIsNotPending_ReturnsFalse(string status)
     {
         var model = TestAnemicModelBuilder.Build(status: status);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

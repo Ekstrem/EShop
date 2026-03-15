@@ -14,8 +14,6 @@ public interface ISession : IBoundedContext
 /// </summary>
 public sealed class SessionBoundedContextDescription : IBoundedContextDescription
 {
-    public string Name => "Session";
-
-    public string Description =>
-        "Manages authentication sessions, token lifecycle, and session security.";
+    public string ContextName => "Session";
+    public int MicroserviceVersion => 1;
 }

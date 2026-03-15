@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
+using Shipment.Domain.Implementation;
 using Shipment.Domain.Specifications;
 using Shipment.DomainServices;
 
@@ -29,13 +31,27 @@ public sealed class CreateShipmentCommandHandler
         // Validate that items are provided.
         var hasItemsValidator = new HasItemsValidator();
 
+        // Build anemic model from command properties.
+        var model = new AnemicModel
+        {
+            Root = ShipmentRoot.CreateInstance(
+                id: Guid.NewGuid(),
+                orderId: request.OrderId,
+                trackingNumber: string.Empty,
+                carrier: request.Carrier,
+                shippingAddress: request.ShippingAddress,
+                status: "Pending",
+                createdAt: DateTime.UtcNow),
+            Items = request.Items
+                .Select(i => ShipmentItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity))
+                .ToList<IShipmentItem>()
+        };
+
         // Build aggregate result via domain logic.
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "CreateShipment",
-            $"Shipment created for order {request.OrderId}.");
+        var result = AggregateResult<IShipment, IShipmentAnemicModel>.Create(model, "CreateShipment");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

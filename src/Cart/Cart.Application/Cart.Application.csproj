@@ -5,12 +5,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cart.Domain\Cart.Domain.csproj" />
-    <ProjectReference Include="..\Cart.DomainServices\Cart.DomainServices.csproj" />
-    <ProjectReference Include="..\Cart.InternalContracts\Cart.InternalContracts.csproj" />
+    <ProjectReference Include="../Cart.Domain/Cart.Domain.csproj" />
+    <ProjectReference Include="../Cart.DomainServices/Cart.DomainServices.csproj" />
+    <ProjectReference Include="../Cart.InternalContracts/Cart.InternalContracts.csproj" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,7 @@
+using Hive.SeedWorks.Events;
 using Customer.Domain;
 using Customer.Domain.Abstraction;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 
 namespace Customer.DomainServices;

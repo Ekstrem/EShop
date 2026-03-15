@@ -8,7 +8,7 @@ namespace Shipment.Domain.Specifications;
 /// </summary>
 public sealed class HasTrackingNumberValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => !string.IsNullOrWhiteSpace(model.Root.TrackingNumber);
 
     public string ErrorMessage => "Shipment must have a tracking number assigned.";

@@ -52,6 +52,7 @@ internal static class TestAnemicModelBuilder
 
     private sealed class TestReturnRequestAnemicModel : IReturnRequestAnemicModel
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public IReturnRequestRoot Root { get; init; } = null!;
         public IReadOnlyList<IReturnItem> Items { get; init; } = new List<IReturnItem>();
         public IReturnLabel? ReturnLabel { get; init; }

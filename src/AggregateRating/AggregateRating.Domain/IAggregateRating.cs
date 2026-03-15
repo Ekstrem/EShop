@@ -14,8 +14,6 @@ public interface IAggregateRating : IBoundedContext
 /// </summary>
 public sealed class AggregateRatingBoundedContextDescription : IBoundedContextDescription
 {
-    public string Name => "AggregateRating";
-
-    public string Description =>
-        "Manages aggregate product ratings, distribution statistics, and weighted averages.";
+    public string ContextName => "AggregateRating";
+    public int MicroserviceVersion => 1;
 }

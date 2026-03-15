@@ -1,6 +1,7 @@
 using Customer.Domain;
 using Customer.Domain.Abstraction;
 using Customer.Domain.Implementation;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,8 +49,9 @@ public sealed class CustomerRepository : IRepository<ICustomer, ICustomerAnemicM
         return CustomerAnemicModel.CreateInstance(entity.Id, root, addressBook, consents);
     }
 
-    public async Task SaveAsync(ICustomerAnemicModel model, CancellationToken ct = default)
+    public async Task SaveAsync(AggregateResult<ICustomer, ICustomerAnemicModel> result, CancellationToken ct = default)
     {
+        var model = result.Model!;
         var existing = await _dbContext.Customers
             .Include(c => c.Addresses)
             .Include(c => c.Consents)

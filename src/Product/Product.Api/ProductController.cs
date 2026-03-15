@@ -26,7 +26,7 @@ public sealed class ProductController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPut("{id:guid}")]
@@ -40,7 +40,7 @@ public sealed class ProductController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/publish")]
@@ -52,7 +52,7 @@ public sealed class ProductController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/archive")]
@@ -64,7 +64,7 @@ public sealed class ProductController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpGet("{id:guid}")]

@@ -5,12 +5,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
-    <PackageReference Include="DigiTFactory.Libraries.CommandRepository.Postgres" Version="0.1.0" />
-    <PackageReference Include="DigiTFactory.Libraries.ReadRepository.Postgres" Version="0.1.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..$CTX.Domain$CTX.Domain.csproj" />
-    <ProjectReference Include="..$CTX.InternalContracts$CTX.InternalContracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
+    <ProjectReference Include="../Payment.Domain/Payment.Domain.csproj" />
+    <ProjectReference Include="../Payment.InternalContracts/Payment.InternalContracts.csproj" />
   </ItemGroup>
 </Project>

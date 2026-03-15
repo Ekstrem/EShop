@@ -8,7 +8,7 @@ namespace Shipment.Domain.Specifications;
 /// </summary>
 public sealed class IsPendingValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Root.Status == "Pending";
 
     public string ErrorMessage => "Shipment must be in Pending status.";

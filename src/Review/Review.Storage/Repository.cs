@@ -1,5 +1,6 @@
 namespace Review.Storage;
 
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Review.Domain;
 using Review.Domain.Abstraction;
@@ -15,7 +16,7 @@ public sealed class Repository : IRepository<IReview, IReviewAnemicModel>
         return Task.FromResult<IReviewAnemicModel?>(null);
     }
 
-    public Task SaveAsync(IReviewAnemicModel model, CancellationToken cancellationToken = default)
+    public Task SaveAsync(AggregateResult<IReview, IReviewAnemicModel> result, CancellationToken cancellationToken = default)
     {
         // Persist aggregate to command store
         return Task.CompletedTask;

@@ -7,6 +7,7 @@ namespace AggregateRating.Domain.Abstraction;
 /// </summary>
 public interface IAggregateRatingRoot : IAggregateRoot<IAggregateRating>
 {
+    Guid Id { get; }
     Guid ProductId { get; }
     decimal AverageRating { get; }
     int TotalReviews { get; }

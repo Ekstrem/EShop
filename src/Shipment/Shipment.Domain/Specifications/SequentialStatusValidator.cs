@@ -9,7 +9,7 @@ namespace Shipment.Domain.Specifications;
 /// </summary>
 public sealed class SequentialStatusValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
 {
-    private static readonly IReadOnlyList<string> StatusOrder = new[]
+    private static readonly List<string> StatusOrder = new()
     {
         "Pending",
         "Packed",
@@ -25,7 +25,7 @@ public sealed class SequentialStatusValidator : IBusinessOperationValidator<IShi
         _targetStatus = targetStatus;
     }
 
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
     {
         var currentIndex = StatusOrder.IndexOf(model.Root.Status);
         var targetIndex = StatusOrder.IndexOf(_targetStatus);

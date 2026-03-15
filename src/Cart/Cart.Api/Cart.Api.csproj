@@ -5,16 +5,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
-    <PackageReference Include="DigiTFactory.Libraries.EventBus.InMemory" Version="0.1.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cart.Application\Cart.Application.csproj" />
-    <ProjectReference Include="..\Cart.Domain\Cart.Domain.csproj" />
-    <ProjectReference Include="..\Cart.DomainServices\Cart.DomainServices.csproj" />
-    <ProjectReference Include="..\Cart.InternalContracts\Cart.InternalContracts.csproj" />
-    <ProjectReference Include="..\Cart.Storage\Cart.Storage.csproj" />
+    <ProjectReference Include="../Cart.Application/Cart.Application.csproj" />
+    <ProjectReference Include="../Cart.Domain/Cart.Domain.csproj" />
+    <ProjectReference Include="../Cart.DomainServices/Cart.DomainServices.csproj" />
+    <ProjectReference Include="../Cart.InternalContracts/Cart.InternalContracts.csproj" />
+    <ProjectReference Include="../Cart.Storage/Cart.Storage.csproj" />
   </ItemGroup>
 </Project>

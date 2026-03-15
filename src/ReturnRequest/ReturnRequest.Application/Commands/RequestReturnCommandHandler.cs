@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
+using ReturnRequest.Domain.Implementation;
 using ReturnRequest.Domain.Specifications;
 using ReturnRequest.DomainServices;
 
@@ -29,12 +31,25 @@ public sealed class RequestReturnCommandHandler
         var hasReasonValidator = new HasReasonValidator();
         var withinReturnPeriodValidator = new WithinReturnPeriodValidator(request.OrderDeliveredAt);
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.CreateInstance(
-            "RequestReturn",
-            $"Return requested for order {request.OrderId}.");
+        var model = new AnemicModel
+        {
+            Root = ReturnRequestRoot.CreateInstance(
+                id: Guid.NewGuid(),
+                orderId: request.OrderId,
+                customerId: request.CustomerId,
+                rmaNumber: $"RMA-{Guid.NewGuid():N}"[..12],
+                reason: request.Reason,
+                status: "Requested",
+                requestedAt: DateTime.UtcNow),
+            Items = request.Items
+                .Select(i => ReturnItem.CreateInstance(i.VariantId, i.ProductName, i.Quantity, i.UnitPrice))
+                .ToList<IReturnItem>()
+        };
+
+        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.Create(model, "RequestReturn");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

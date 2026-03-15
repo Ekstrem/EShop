@@ -25,7 +25,7 @@ public sealed class CategoryController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPut("{id:guid}")]
@@ -39,7 +39,7 @@ public sealed class CategoryController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/move")]
@@ -53,7 +53,7 @@ public sealed class CategoryController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/deactivate")]
@@ -65,7 +65,7 @@ public sealed class CategoryController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/activate")]
@@ -77,7 +77,7 @@ public sealed class CategoryController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpGet("{id:guid}")]

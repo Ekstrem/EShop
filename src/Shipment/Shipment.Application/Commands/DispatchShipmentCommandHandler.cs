@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
+using Shipment.Domain.Implementation;
 using Shipment.Domain.Specifications;
 using Shipment.DomainServices;
 
@@ -37,12 +39,23 @@ public sealed class DispatchShipmentCommandHandler
         var hasTrackingValidator = new HasTrackingNumberValidator();
         var hasLabelValidator = new HasLabelValidator();
 
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "DispatchShipment",
-            $"Shipment {request.ShipmentId} dispatched with tracking {request.TrackingNumber}.");
+        var model = new AnemicModel
+        {
+            Root = ShipmentRoot.CreateInstance(
+                id: request.ShipmentId,
+                orderId: Guid.Empty,
+                trackingNumber: request.TrackingNumber,
+                carrier: string.Empty,
+                shippingAddress: string.Empty,
+                status: "Shipped",
+                createdAt: DateTime.UtcNow),
+            Label = ShippingLabel.CreateInstance(request.LabelUrl, DateTime.UtcNow)
+        };
+
+        var result = AggregateResult<IShipment, IShipmentAnemicModel>.Create(model, "DispatchShipment");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

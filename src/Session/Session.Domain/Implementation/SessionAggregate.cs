@@ -1,3 +1,4 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Session.Domain.Abstraction;
 
@@ -29,7 +30,7 @@ public sealed class SessionAggregate
         var model = SessionAnemicModel.CreateInstance(id, root);
 
         return AggregateResult<ISession, ISessionAnemicModel>
-            .CreateInstance(model, nameof(CreateSession));
+            .Create(model, nameof(CreateSession));
     }
 
     /// <summary>
@@ -51,7 +52,7 @@ public sealed class SessionAggregate
         var model = SessionAnemicModel.CreateInstance(current.Id, root);
 
         return AggregateResult<ISession, ISessionAnemicModel>
-            .CreateInstance(model, nameof(RefreshSession));
+            .Create(model, nameof(RefreshSession));
     }
 
     /// <summary>
@@ -71,7 +72,7 @@ public sealed class SessionAggregate
         var model = SessionAnemicModel.CreateInstance(current.Id, root);
 
         return AggregateResult<ISession, ISessionAnemicModel>
-            .CreateInstance(model, nameof(RevokeSession));
+            .Create(model, nameof(RevokeSession));
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ public sealed class SessionAggregate
                     session.Root.DeviceInfo);
                 var model = SessionAnemicModel.CreateInstance(session.Id, root);
                 return AggregateResult<ISession, ISessionAnemicModel>
-                    .CreateInstance(model, nameof(RevokeAllSessions));
+                    .Create(model, nameof(RevokeAllSessions));
             })
             .ToList()
             .AsReadOnly();

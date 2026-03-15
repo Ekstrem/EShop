@@ -27,7 +27,7 @@ public sealed class StockItemController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/release")]
@@ -41,7 +41,7 @@ public sealed class StockItemController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/replenish")]
@@ -55,7 +55,7 @@ public sealed class StockItemController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpPost("{id:guid}/adjust")]
@@ -69,7 +69,7 @@ public sealed class StockItemController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.ErrorMessage);
 
-        return Ok(result.Value);
+        return Ok(result.Model);
     }
 
     [HttpGet("{id:guid}")]

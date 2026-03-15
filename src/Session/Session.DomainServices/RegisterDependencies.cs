@@ -1,4 +1,5 @@
 using Autofac;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Session.Domain;
 using Session.Domain.Abstraction;

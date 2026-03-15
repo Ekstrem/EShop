@@ -1,5 +1,6 @@
 namespace Order.Domain.Aggregate;
 
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Order.Domain.Abstraction;
 using Order.Domain.Implementation;

@@ -3,6 +3,7 @@ using Customer.Domain.Abstraction;
 using Customer.Domain.Implementation;
 using Customer.Domain.Specifications;
 using Customer.DomainServices;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 

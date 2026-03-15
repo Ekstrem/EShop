@@ -7,6 +7,7 @@ using Session.Domain.Abstraction;
 using Session.DomainServices;
 using Session.InternalContracts;
 using Session.Storage;
+using ISession = Session.Domain.ISession;
 
 var builder = WebApplication.CreateBuilder(args);
 

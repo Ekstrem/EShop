@@ -1,6 +1,7 @@
 namespace Order.DomainServices;
 
 using Autofac;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Order.Domain;
 using Order.Domain.Abstraction;

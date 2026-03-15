@@ -11,7 +11,7 @@ public sealed class IsRequestedValidatorTests
     public void IsValid_WhenStatusIsRequested_ReturnsTrue()
     {
         var model = TestAnemicModelBuilder.Build(status: "Requested");
-        Assert.True(_validator.IsValid(model));
+        Assert.True(_validator.IsSatisfiedBy(model));
     }
 
     [Theory]
@@ -24,6 +24,6 @@ public sealed class IsRequestedValidatorTests
     public void IsValid_WhenStatusIsNotRequested_ReturnsFalse(string status)
     {
         var model = TestAnemicModelBuilder.Build(status: status);
-        Assert.False(_validator.IsValid(model));
+        Assert.False(_validator.IsSatisfiedBy(model));
     }
 }

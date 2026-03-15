@@ -1,3 +1,4 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Session.Domain;
 using Session.Domain.Abstraction;
@@ -25,6 +26,6 @@ public sealed class AggregateProvider
         AggregateResult<ISession, ISessionAnemicModel> result,
         CancellationToken ct = default)
     {
-        await _repository.SaveAsync(result.AnemicModel, ct);
+        await _repository.SaveAsync(result, ct);
     }
 }

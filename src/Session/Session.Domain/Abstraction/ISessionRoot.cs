@@ -7,6 +7,7 @@ namespace Session.Domain.Abstraction;
 /// </summary>
 public interface ISessionRoot : IAggregateRoot<ISession>
 {
+    Guid Id { get; }
     Guid CustomerId { get; }
     string Token { get; }
     DateTime ExpiresAt { get; }

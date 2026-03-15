@@ -7,6 +7,7 @@ namespace Review.Domain.Abstraction;
 /// </summary>
 public interface IReviewRoot : IAggregateRoot<IReview>
 {
+    Guid Id { get; }
     Guid ProductId { get; }
     Guid CustomerId { get; }
     int Rating { get; }

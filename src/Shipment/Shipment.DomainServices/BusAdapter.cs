@@ -1,3 +1,4 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;

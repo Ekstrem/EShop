@@ -1,3 +1,5 @@
+using Hive.SeedWorks.Events;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Session.Domain;
 using Session.Domain.Abstraction;
@@ -7,7 +9,7 @@ namespace Session.DomainServices;
 /// <summary>
 /// Decorator that notifies observers after aggregate operations complete.
 /// </summary>
-public sealed class Notifier
+public sealed class Notifier : INotifier<ISession>
 {
     private readonly AggregateProvider _provider;
     private readonly IObserver<AggregateResult<ISession, ISessionAnemicModel>> _observer;
@@ -18,6 +20,11 @@ public sealed class Notifier
     {
         _provider = provider;
         _observer = observer;
+    }
+
+    public void Notify<TModel>(AggregateResult<ISession, TModel> result)
+        where TModel : IAnemicModel<ISession>
+    {
     }
 
     public async Task HandleAsync(

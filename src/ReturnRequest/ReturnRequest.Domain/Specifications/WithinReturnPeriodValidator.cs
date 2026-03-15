@@ -16,7 +16,7 @@ public sealed class WithinReturnPeriodValidator : IBusinessOperationValidator<IR
         _orderDeliveredAt = orderDeliveredAt;
     }
 
-    public bool IsValid(IReturnRequestAnemicModel model)
+    public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
     {
         var daysSinceDelivery = (model.Root.RequestedAt - _orderDeliveredAt).TotalDays;
         return daysSinceDelivery <= ReturnPeriodDays;

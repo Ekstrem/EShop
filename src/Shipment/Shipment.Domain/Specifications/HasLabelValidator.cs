@@ -8,7 +8,7 @@ namespace Shipment.Domain.Specifications;
 /// </summary>
 public sealed class HasLabelValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Label is not null && !string.IsNullOrWhiteSpace(model.Label.LabelUrl);
 
     public string ErrorMessage => "Shipment must have a shipping label.";

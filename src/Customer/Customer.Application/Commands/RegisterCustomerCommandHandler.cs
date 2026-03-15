@@ -4,6 +4,7 @@ using Customer.Domain.Implementation;
 using Customer.Domain.Specifications;
 using Customer.DomainServices;
 using Customer.InternalContracts;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 
@@ -36,7 +37,7 @@ public sealed class RegisterCustomerCommandHandler
             request.LastName,
             request.PasswordHash);
 
-        if (!emailValidator.IsSatisfiedBy(result.AnemicModel))
+        if (!emailValidator.IsSatisfiedBy(result.Model))
             throw new InvalidOperationException(emailValidator.ErrorMessage);
 
         await _notifier.HandleAsync(result, ct);

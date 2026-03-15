@@ -8,7 +8,7 @@ namespace Shipment.Domain.Specifications;
 /// </summary>
 public sealed class IsNotDeliveredValidator : IBusinessOperationValidator<IShipment, IShipmentAnemicModel>
 {
-    public bool IsValid(IShipmentAnemicModel model)
+    public bool IsSatisfiedBy(IShipmentAnemicModel model)
         => model.Root.Status != "Delivered";
 
     public string ErrorMessage => "Shipment has already been delivered.";

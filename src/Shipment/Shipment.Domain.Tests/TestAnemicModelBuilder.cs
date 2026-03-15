@@ -47,6 +47,7 @@ internal static class TestAnemicModelBuilder
 
     private sealed class TestShipmentAnemicModel : IShipmentAnemicModel
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public IShipmentRoot Root { get; init; } = null!;
         public IReadOnlyList<IShipmentItem> Items { get; init; } = new List<IShipmentItem>();
         public IShippingLabel? Label { get; init; }

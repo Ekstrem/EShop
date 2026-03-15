@@ -1,12 +1,13 @@
 namespace Invoice.DomainServices;
 
+using Hive.SeedWorks.Events;
 using Hive.SeedWorks.TacticalPatterns;
 using Hive.SeedWorks.Result;
 using Invoice.Domain;
 using Invoice.Domain.Abstraction;
 using Invoice.Domain.Implementation;
 
-public sealed class Notifier : IObservable<AggregateResult<IInvoice, IInvoiceAnemicModel>>
+public sealed class Notifier : INotifier<IInvoice>, IObservable<AggregateResult<IInvoice, IInvoiceAnemicModel>>
 {
     private readonly List<IObserver<AggregateResult<IInvoice, IInvoiceAnemicModel>>> _observers = new();
     private Aggregate _aggregate;
@@ -57,6 +58,10 @@ public sealed class Notifier : IObservable<AggregateResult<IInvoice, IInvoiceAne
         var result = _aggregate.GenerateCreditNote(creditNoteNumber, refundAmount);
         Notify(result);
         return result;
+    }
+
+    void INotifier<IInvoice>.Notify<TModel>(AggregateResult<IInvoice, TModel> result)
+    {
     }
 
     private void Notify(AggregateResult<IInvoice, IInvoiceAnemicModel> result)

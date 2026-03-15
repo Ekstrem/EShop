@@ -8,7 +8,7 @@ namespace ReturnRequest.Domain.Specifications;
 /// </summary>
 public sealed class IsApprovedValidator : IBusinessOperationValidator<IReturnRequest, IReturnRequestAnemicModel>
 {
-    public bool IsValid(IReturnRequestAnemicModel model)
+    public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
         => model.Root.Status == "Approved";
 
     public string ErrorMessage => "Return request must be in Approved status.";

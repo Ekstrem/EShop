@@ -1,5 +1,7 @@
+using Hive.SeedWorks.Events;
 namespace Order.DomainServices;
 
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using Order.Domain;
 using Order.Domain.Abstraction;

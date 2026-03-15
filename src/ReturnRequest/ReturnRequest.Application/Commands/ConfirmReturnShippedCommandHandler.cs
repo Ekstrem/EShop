@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
+using ReturnRequest.Domain.Implementation;
 using ReturnRequest.Domain.Specifications;
 using ReturnRequest.DomainServices;
 
@@ -35,12 +37,22 @@ public sealed class ConfirmReturnShippedCommandHandler
 
         var isApprovedValidator = new IsApprovedValidator();
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.CreateInstance(
-            "ConfirmReturnShipped",
-            $"Return request {request.ReturnRequestId} confirmed as shipped.");
+        var model = new AnemicModel
+        {
+            Root = ReturnRequestRoot.CreateInstance(
+                id: request.ReturnRequestId,
+                orderId: Guid.Empty,
+                customerId: Guid.Empty,
+                rmaNumber: string.Empty,
+                reason: string.Empty,
+                status: "ReturnShipped",
+                requestedAt: DateTime.UtcNow)
+        };
+
+        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.Create(model, "ConfirmReturnShipped");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

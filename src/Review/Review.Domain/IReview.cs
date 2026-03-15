@@ -14,8 +14,6 @@ public interface IReview : IBoundedContext
 /// </summary>
 public sealed class ReviewBoundedContextDescription : IBoundedContextDescription
 {
-    public string Name => "Review";
-
-    public string Description =>
-        "Manages product reviews, ratings, moderation, helpful votes, and flagging.";
+    public string ContextName => "Review";
+    public int MicroserviceVersion => 1;
 }

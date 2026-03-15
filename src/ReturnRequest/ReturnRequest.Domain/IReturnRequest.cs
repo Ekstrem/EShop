@@ -14,8 +14,6 @@ public interface IReturnRequest : IBoundedContext
 /// </summary>
 public sealed class ReturnRequestBoundedContextDescription : IBoundedContextDescription
 {
-    public string Name => "ReturnRequest";
-
-    public string Description =>
-        "Manages return requests, approvals, rejections, return shipping, receiving, and refund lifecycle.";
+    public string ContextName => "ReturnRequest";
+    public int MicroserviceVersion => 1;
 }

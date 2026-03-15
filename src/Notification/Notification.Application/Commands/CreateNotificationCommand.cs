@@ -4,6 +4,7 @@ using MediatR;
 using Hive.SeedWorks.Result;
 using Notification.Domain;
 using Notification.Domain.Abstraction;
+using INotification = Notification.Domain.INotification;
 
 public sealed record CreateNotificationCommand(
     Guid CustomerId,

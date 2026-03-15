@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using Shipment.Domain;
 using Shipment.Domain.Abstraction;
+using Shipment.Domain.Implementation;
 using Shipment.Domain.Specifications;
 using Shipment.DomainServices;
 
@@ -36,12 +38,22 @@ public sealed class HandleCarrierUpdateCommandHandler
         var isNotDeliveredValidator = new IsNotDeliveredValidator();
         var sequentialValidator = new SequentialStatusValidator(request.NewStatus);
 
-        var result = AggregateResult<IShipment, IShipmentAnemicModel>.CreateInstance(
-            "HandleCarrierUpdate",
-            $"Shipment {request.ShipmentId} updated to {request.NewStatus}.");
+        var model = new AnemicModel
+        {
+            Root = ShipmentRoot.CreateInstance(
+                id: request.ShipmentId,
+                orderId: Guid.Empty,
+                trackingNumber: string.Empty,
+                carrier: string.Empty,
+                shippingAddress: string.Empty,
+                status: request.NewStatus,
+                createdAt: DateTime.UtcNow)
+        };
+
+        var result = AggregateResult<IShipment, IShipmentAnemicModel>.Create(model, "HandleCarrierUpdate");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

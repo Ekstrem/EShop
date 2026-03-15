@@ -5,6 +5,7 @@ using Hive.SeedWorks.Result;
 using Notification.Domain;
 using Notification.Domain.Abstraction;
 using Notification.Domain.Implementation;
+using INotification = Notification.Domain.INotification;
 
 public sealed class CreateNotificationHandler
     : IRequestHandler<CreateNotificationCommand, AggregateResult<INotification, INotificationAnemicModel>>

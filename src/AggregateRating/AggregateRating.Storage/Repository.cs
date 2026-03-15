@@ -1,5 +1,6 @@
 namespace AggregateRating.Storage;
 
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using AggregateRating.Domain;
 using AggregateRating.Domain.Abstraction;
@@ -15,7 +16,7 @@ public sealed class Repository : IRepository<IAggregateRating, IAggregateRatingA
         return Task.FromResult<IAggregateRatingAnemicModel?>(null);
     }
 
-    public Task SaveAsync(IAggregateRatingAnemicModel model, CancellationToken cancellationToken = default)
+    public Task SaveAsync(AggregateResult<IAggregateRating, IAggregateRatingAnemicModel> result, CancellationToken cancellationToken = default)
     {
         // Persist aggregate to command store
         return Task.CompletedTask;

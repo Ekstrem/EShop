@@ -16,7 +16,7 @@ public sealed class ItemNotAlreadyReturnedValidator : IBusinessOperationValidato
         _alreadyReturnedVariantIds = alreadyReturnedVariantIds;
     }
 
-    public bool IsValid(IReturnRequestAnemicModel model)
+    public bool IsSatisfiedBy(IReturnRequestAnemicModel model)
     {
         return !model.Items.Any(item =>
             _alreadyReturnedVariantIds.Contains(item.VariantId));

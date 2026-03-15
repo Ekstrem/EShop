@@ -11,7 +11,7 @@ public sealed class WithinReturnPeriodValidatorTests
         var deliveredAt = DateTime.UtcNow.AddDays(-10);
         var validator = new WithinReturnPeriodValidator(deliveredAt);
         var model = TestAnemicModelBuilder.Build(requestedAt: DateTime.UtcNow);
-        Assert.True(validator.IsValid(model));
+        Assert.True(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -21,7 +21,7 @@ public sealed class WithinReturnPeriodValidatorTests
         var deliveredAt = now.AddDays(-14);
         var validator = new WithinReturnPeriodValidator(deliveredAt);
         var model = TestAnemicModelBuilder.Build(requestedAt: now);
-        Assert.True(validator.IsValid(model));
+        Assert.True(validator.IsSatisfiedBy(model));
     }
 
     [Fact]
@@ -30,6 +30,6 @@ public sealed class WithinReturnPeriodValidatorTests
         var deliveredAt = DateTime.UtcNow.AddDays(-20);
         var validator = new WithinReturnPeriodValidator(deliveredAt);
         var model = TestAnemicModelBuilder.Build(requestedAt: DateTime.UtcNow);
-        Assert.False(validator.IsValid(model));
+        Assert.False(validator.IsSatisfiedBy(model));
     }
 }

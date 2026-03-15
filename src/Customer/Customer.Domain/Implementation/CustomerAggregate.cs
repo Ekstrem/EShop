@@ -1,4 +1,5 @@
 using Customer.Domain.Abstraction;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 
 namespace Customer.Domain.Implementation;
@@ -30,7 +31,7 @@ public sealed class CustomerAggregate
         var model = CustomerAnemicModel.CreateInstance(id, root, addressBook, consents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(RegisterCustomer));
+            .Create(model, nameof(RegisterCustomer));
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public sealed class CustomerAggregate
             current.Id, root, current.AddressBook, current.Consents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(VerifyEmail));
+            .Create(model, nameof(VerifyEmail));
     }
 
     /// <summary>
@@ -73,7 +74,7 @@ public sealed class CustomerAggregate
             current.Id, root, addressBook, current.Consents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(UpdateProfile));
+            .Create(model, nameof(UpdateProfile));
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ public sealed class CustomerAggregate
             current.Id, root, current.AddressBook, current.Consents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(ChangePassword));
+            .Create(model, nameof(ChangePassword));
     }
 
     /// <summary>
@@ -104,7 +105,7 @@ public sealed class CustomerAggregate
         ICustomerAnemicModel current)
     {
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(current, nameof(RequestPasswordReset));
+            .Create(current, nameof(RequestPasswordReset));
     }
 
     /// <summary>
@@ -125,7 +126,7 @@ public sealed class CustomerAggregate
             current.Id, root, current.AddressBook, current.Consents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(ResetPassword));
+            .Create(model, nameof(ResetPassword));
     }
 
     /// <summary>
@@ -146,7 +147,7 @@ public sealed class CustomerAggregate
             current.Id, current.Root, current.AddressBook, updatedConsents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(UpdateConsent));
+            .Create(model, nameof(UpdateConsent));
     }
 
     /// <summary>
@@ -169,6 +170,6 @@ public sealed class CustomerAggregate
             current.Id, root, emptyAddressBook, clearedConsents);
 
         return AggregateResult<ICustomer, ICustomerAnemicModel>
-            .CreateInstance(model, nameof(DeactivateAccount));
+            .Create(model, nameof(DeactivateAccount));
     }
 }

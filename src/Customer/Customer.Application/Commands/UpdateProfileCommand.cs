@@ -1,5 +1,6 @@
 using Customer.Domain;
 using Customer.Domain.Abstraction;
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 

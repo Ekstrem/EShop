@@ -1,3 +1,4 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;

@@ -9,7 +9,7 @@ using Review.Domain.Abstraction;
 /// </summary>
 public sealed class CommandDbContext : ICommandDbContext<IReview>
 {
-    public Task SaveAsync(IReviewAnemicModel model, CancellationToken cancellationToken = default)
+    public Task SaveAsync(IAnemicModel<IReview> model, CancellationToken cancellationToken = default)
     {
         // Persist aggregate state to command store (PostgreSQL, etc.)
         return Task.CompletedTask;

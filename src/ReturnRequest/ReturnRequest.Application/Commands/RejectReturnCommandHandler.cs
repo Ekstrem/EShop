@@ -1,7 +1,9 @@
+using Hive.SeedWorks.Result;
 using Hive.SeedWorks.TacticalPatterns;
 using MediatR;
 using ReturnRequest.Domain;
 using ReturnRequest.Domain.Abstraction;
+using ReturnRequest.Domain.Implementation;
 using ReturnRequest.Domain.Specifications;
 using ReturnRequest.DomainServices;
 
@@ -35,12 +37,22 @@ public sealed class RejectReturnCommandHandler
 
         var isRequestedValidator = new IsRequestedValidator();
 
-        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.CreateInstance(
-            "RejectReturn",
-            $"Return request {request.ReturnRequestId} rejected: {request.RejectionReason}.");
+        var model = new AnemicModel
+        {
+            Root = ReturnRequestRoot.CreateInstance(
+                id: request.ReturnRequestId,
+                orderId: Guid.Empty,
+                customerId: Guid.Empty,
+                rmaNumber: string.Empty,
+                reason: request.RejectionReason,
+                status: "Rejected",
+                requestedAt: DateTime.UtcNow)
+        };
+
+        var result = AggregateResult<IReturnRequest, IReturnRequestAnemicModel>.Create(model, "RejectReturn");
 
         await _busAdapter.PublishAsync(result, cancellationToken);
-        await _notifier.NotifyAsync(result, cancellationToken);
+        _notifier.Notify(result);
 
         return result;
     }

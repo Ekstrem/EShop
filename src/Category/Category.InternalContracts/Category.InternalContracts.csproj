@@ -5,9 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DigiTFactory.Libraries.SeedWorks" Version="0.4.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..$CTX.Domain$CTX.Domain.csproj" />
+    <ProjectReference Include="../../Shared/Hive.SeedWorks/Hive.SeedWorks.csproj" />
+    <ProjectReference Include="../Category.Domain/Category.Domain.csproj" />
   </ItemGroup>
 </Project>
