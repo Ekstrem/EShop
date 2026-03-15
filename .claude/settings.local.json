@@ -70,7 +70,9 @@
       "Bash(then echo:*)",
       "Bash(grep -l 'EShop.Contracts' src/AggregateRating/AggregateRating.Domain.Tests/*.csproj src/Review/Review.Domain.Tests/*.csproj src/EShop.IntegrationTests/*.csproj src/Shipment/Shipment.Domain.Tests/*.csproj src/ReturnRequest/ReturnRequest.Domain.Tests/*.csproj)",
       "Bash(find /c/Users/About/.nuget/packages/digitfactory.libraries.seedworks -name *.dll)",
-      "Bash(/c/Users/About/.dotnet/dotnet test:*)"
+      "Bash(/c/Users/About/.dotnet/dotnet test:*)",
+      "Bash(ls src/*.sln)",
+      "Bash(ls *.sln)"
     ]
   }
 }
